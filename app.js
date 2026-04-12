@@ -1,5 +1,5 @@
 const express = require('express');
-const sql = require('mssql');
+const { Pool } = require('pg'); 
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
 const path = require('path');
@@ -10,19 +10,11 @@ const { OAuth2Client } = require('google-auth-library');
 const app = express();
 const client = new OAuth2Client('996749304935-mav75khojhn4ibjasoglbj0iilmko4o6.apps.googleusercontent.com');
 
-// --- CAMBIO PARA EL SERVIDOR ---
-// Usa las credenciales de Railway si existen, si no, usa las de tu PC (localhost)
-const config = {
-    user: process.env.DB_USER || 'sa', 
-    password: process.env.DB_PASSWORD || '123456', 
-    server: process.env.DB_SERVER || 'localhost', 
-    database: process.env.DB_NAME || 'imc_plus', 
-    options: {
-        encrypt: false, 
-        trustServerCertificate: true
-    },
-    port: parseInt(process.env.DB_PORT) || 1433 
-};
+// --- CAMBIO PARA EL SERVIDOR: Configuración de PostgreSQL ---
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+});
 
 const uploadDir = path.join(__dirname, 'public/css/images/uploads/');
 if (!fs.existsSync(uploadDir)){
@@ -48,7 +40,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'secreto_imc_full_2026', // Mejor práctica
+    secret: process.env.SESSION_SECRET || 'secreto_imc_full_2026', 
     resave: false,
     saveUninitialized: false
 }));
@@ -155,24 +147,19 @@ app.post('/auth-google', async (req, res) => {
         const nombre = payload['name'];
         const fotoGoogle = payload['picture'];
 
-        let pool = await sql.connect(config);
-        let result = await pool.request()
-            .input('email', sql.NVarChar, email)
-            .query('SELECT * FROM Usuarios WHERE email = @email');
+        let result = await pool.query('SELECT * FROM Usuarios WHERE email = $1', [email]);
 
         let user;
-        if (result.recordset.length === 0) {
-            await pool.request()
-                .input('nombre', sql.NVarChar, nombre)
-                .input('email', sql.NVarChar, email)
-                .input('foto', sql.NVarChar, fotoGoogle)
-                .input('username', sql.NVarChar, email.split('@')[0]) 
-                .query("INSERT INTO Usuarios (nombre, username, email, password, foto_perfil) VALUES (@nombre, @username, @email, 'GOOGLE_AUTH', @foto)");
+        if (result.rows.length === 0) {
+            await pool.query(
+                "INSERT INTO Usuarios (nombre, username, email, password, foto_perfil) VALUES ($1, $2, $3, 'GOOGLE_AUTH', $4)",
+                [nombre, email.split('@')[0], email, fotoGoogle]
+            );
             
-            let resNuevo = await pool.request().input('email', sql.NVarChar, email).query('SELECT * FROM Usuarios WHERE email = @email');
-            user = resNuevo.recordset[0];
+            let resNuevo = await pool.query('SELECT * FROM Usuarios WHERE email = $1', [email]);
+            user = resNuevo.rows[0];
         } else {
-            user = result.recordset[0];
+            user = result.rows[0];
         }
 
         req.session.usuarioId = user.id;
@@ -190,12 +177,9 @@ app.post('/auth-google', async (req, res) => {
 app.post('/registrar', async (req, res) => {
     const { nombre, email, password, username } = req.body; 
     try {
-        let pool = await sql.connect(config);
-        const checkUser = await pool.request()
-            .input('email', sql.NVarChar, email)
-            .query('SELECT id FROM Usuarios WHERE email = @email');
+        const checkUser = await pool.query('SELECT id FROM Usuarios WHERE email = $1', [email]);
 
-        if (checkUser.recordset.length > 0) {
+        if (checkUser.rows.length > 0) {
             return res.status(400).json({ 
                 success: false, 
                 code: 'EMAIL_EXISTS', 
@@ -204,12 +188,10 @@ app.post('/registrar', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        await pool.request()
-            .input('nombre', sql.NVarChar, nombre)
-            .input('username', sql.NVarChar, username || email.split('@')[0]) 
-            .input('email', sql.NVarChar, email)
-            .input('password', sql.NVarChar, hashedPassword)
-            .query('INSERT INTO Usuarios (nombre, username, email, password) VALUES (@nombre, @username, @email, @password)');
+        await pool.query(
+            'INSERT INTO Usuarios (nombre, username, email, password) VALUES ($1, $2, $3, $4)',
+            [nombre, username || email.split('@')[0], email, hashedPassword]
+        );
         
         res.status(200).json({ success: true, message: 'Usuario creado' });
     } catch (err) { 
@@ -222,11 +204,10 @@ app.post('/registrar', async (req, res) => {
 app.post('/auth', async (req, res) => {
     const { email, password } = req.body;
     try {
-        let pool = await sql.connect(config);
-        let result = await pool.request().input('email', sql.NVarChar, email).query('SELECT * FROM Usuarios WHERE email = @email');
+        let result = await pool.query('SELECT * FROM Usuarios WHERE email = $1', [email]);
         
-        if (result.recordset.length > 0) {
-            const user = result.recordset[0];
+        if (result.rows.length > 0) {
+            const user = result.rows[0];
             if (user.password === 'GOOGLE_AUTH') return res.render('login', { error: "Usa el botón de Google." });
             
             const match = await bcrypt.compare(password, user.password);
@@ -248,16 +229,13 @@ app.post('/auth', async (req, res) => {
 app.post('/recuperar', async (req, res) => {
     const { email, newPassword } = req.body;
     try {
-        let pool = await sql.connect(config);
-        let result = await pool.request()
-            .input('email', sql.NVarChar, email)
-            .query('SELECT * FROM Usuarios WHERE email = @email');
+        let result = await pool.query('SELECT * FROM Usuarios WHERE email = $1', [email]);
         
-        if (result.recordset.length === 0) {
+        if (result.rows.length === 0) {
             return res.render('recuperar', { error: "Este correo no está registrado en el sistema.", success: null });
         }
 
-        const user = result.recordset[0];
+        const user = result.rows[0];
         
         if (user.password === 'GOOGLE_AUTH') {
             return res.render('recuperar', { error: "Este correo usa inicio de sesión con Google. No necesitas contraseña.", success: null });
@@ -265,10 +243,7 @@ app.post('/recuperar', async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        await pool.request()
-            .input('email', sql.NVarChar, email)
-            .input('password', sql.NVarChar, hashedPassword)
-            .query('UPDATE Usuarios SET password = @password WHERE email = @email');
+        await pool.query('UPDATE Usuarios SET password = $1 WHERE email = $2', [hashedPassword, email]);
 
         res.render('recuperar', { error: null, success: "Contraseña actualizada con éxito. ¡Ya puedes iniciar sesión!" });
 
@@ -290,23 +265,15 @@ app.post('/calcular', async (req, res) => {
     const imc = (peso / (altura * altura)).toFixed(2);
 
     try {
-        let pool = await sql.connect(config);
+        let resultEstado = await pool.query('SELECT fn_CalcularEstadoIMC($1) as estado', [imc]);
         
-        let resultEstado = await pool.request()
-            .input('imc', sql.Decimal(5, 2), imc)
-            .query('SELECT dbo.fn_CalcularEstadoIMC(@imc) as estado');
-        
-        const estadoCientifico = resultEstado.recordset[0].estado;
+        const estadoCientifico = resultEstado.rows[0].estado;
 
         if (req.session.usuarioId) {
-            await pool.request()
-                .input('IdUsuario', sql.Int, req.session.usuarioId)
-                .input('NombreUsuario', sql.NVarChar, req.session.nombre)
-                .input('Peso', sql.Decimal(5, 2), peso)
-                .input('Altura', sql.Decimal(5, 2), altura)
-                .input('ResultadoIMC', sql.Decimal(5, 2), imc)
-                .input('Estado', sql.NVarChar, estadoCientifico)
-                .execute('sp_GuardarHistorial'); 
+            await pool.query(
+                'CALL sp_GuardarHistorial($1, $2, $3, $4, $5, $6)',
+                [req.session.usuarioId, req.session.nombre, peso, altura, imc, estadoCientifico]
+            ); 
         }
 
         res.json({ 
@@ -326,12 +293,9 @@ app.post('/calcular', async (req, res) => {
 app.get('/historial', async (req, res) => {
     if (!req.session.usuarioId) return res.redirect('/login');
     try {
-        let pool = await sql.connect(config);
-        let result = await pool.request()
-            .input('uid', sql.Int, req.session.usuarioId)
-            .query('SELECT * FROM Historial WHERE id_del_usuario = @uid ORDER BY fecha DESC');
+        let result = await pool.query('SELECT * FROM Historial WHERE id_del_usuario = $1 ORDER BY fecha DESC', [req.session.usuarioId]);
         res.render('historial', { 
-            registros: result.recordset, 
+            registros: result.rows, 
             nombre: req.session.nombre || null, 
             usuario: req.session.username || null,
             foto: req.session.foto 
@@ -345,11 +309,7 @@ app.get('/historial', async (req, res) => {
 app.get('/borrar-historial', async (req, res) => {
     if (!req.session.usuarioId) return res.redirect('/login');
     try {
-        let pool = await sql.connect(config);
-        await pool.request()
-            .input('uid', sql.Int, req.session.usuarioId)
-            .query('DELETE FROM Historial WHERE id_del_usuario = @uid');
-        
+        await pool.query('DELETE FROM Historial WHERE id_del_usuario = $1', [req.session.usuarioId]);
         res.redirect('/historial');
     } catch (err) {
         console.error("Error al borrar el historial:", err);
@@ -361,17 +321,14 @@ app.get('/borrar-historial', async (req, res) => {
 app.get('/editar-perfil', async (req, res) => {
     if (!req.session.usuarioId) return res.redirect('/login');
     try {
-        let pool = await sql.connect(config);
-        let result = await pool.request()
-            .input('id', sql.Int, req.session.usuarioId)
-            .query('SELECT nombre, email, username, foto_perfil FROM Usuarios WHERE id = @id');
+        let result = await pool.query('SELECT nombre, email, username, foto_perfil FROM Usuarios WHERE id = $1', [req.session.usuarioId]);
 
-        if (result.recordset.length > 0) {
+        if (result.rows.length > 0) {
             res.render('editar-perfil', { 
                 nombre: req.session.nombre || null, 
                 usuario: req.session.username || null,
                 foto: req.session.foto,
-                datos: result.recordset[0],
+                datos: result.rows[0],
                 error: null,
                 success: req.query.success 
             });
@@ -390,22 +347,19 @@ app.post('/actualizar-perfil', upload.single('foto'), async (req, res) => {
     const fotoPath = req.file ? `/css/images/uploads/${req.file.filename}` : null;
 
     try {
-        let pool = await sql.connect(config);
-        
         req.session.username = username; 
 
         if (fotoPath) {
-            await pool.request()
-                .input('id', sql.Int, req.session.usuarioId)
-                .input('username', sql.NVarChar, username)
-                .input('foto', sql.NVarChar, fotoPath)
-                .query('UPDATE Usuarios SET username = @username, foto_perfil = @foto WHERE id = @id');
+            await pool.query(
+                'UPDATE Usuarios SET username = $1, foto_perfil = $2 WHERE id = $3',
+                [username, fotoPath, req.session.usuarioId]
+            );
             req.session.foto = fotoPath; 
         } else {
-            await pool.request()
-                .input('id', sql.Int, req.session.usuarioId)
-                .input('username', sql.NVarChar, username)
-                .query('UPDATE Usuarios SET username = @username WHERE id = @id');
+            await pool.query(
+                'UPDATE Usuarios SET username = $1 WHERE id = $2',
+                [username, req.session.usuarioId]
+            );
         }
         res.redirect('/editar-perfil?success=true');
     } catch (err) {
@@ -419,12 +373,8 @@ app.post('/eliminar-foto', async (req, res) => {
     if (!req.session.usuarioId) return res.redirect('/login');
 
     try {
-        let pool = await sql.connect(config);
-        const result = await pool.request()
-            .input('id', sql.Int, req.session.usuarioId)
-            .query('SELECT foto_perfil FROM Usuarios WHERE id = @id');
-
-        const currentPhoto = result.recordset[0]?.foto_perfil;
+        const result = await pool.query('SELECT foto_perfil FROM Usuarios WHERE id = $1', [req.session.usuarioId]);
+        const currentPhoto = result.rows[0]?.foto_perfil;
 
         if (currentPhoto && currentPhoto.includes('/uploads/')) {
             const fullPath = path.join(__dirname, 'public', currentPhoto);
@@ -433,9 +383,7 @@ app.post('/eliminar-foto', async (req, res) => {
             }
         }
 
-        await pool.request()
-            .input('id', sql.Int, req.session.usuarioId)
-            .query('UPDATE Usuarios SET foto_perfil = NULL WHERE id = @id');
+        await pool.query('UPDATE Usuarios SET foto_perfil = NULL WHERE id = $1', [req.session.usuarioId]);
 
         req.session.foto = null;
         res.redirect('/editar-perfil?status=photo_deleted');
