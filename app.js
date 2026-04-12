@@ -396,7 +396,56 @@ app.post('/eliminar-foto', async (req, res) => {
 app.get('/logout', (req, res) => { 
     req.session.destroy(() => { res.redirect('/'); });
 });
+// --- RUTA SECRETA PARA CREAR TABLAS ---
+app.get('/crear-tablas', async (req, res) => {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS Usuarios (
+                id SERIAL PRIMARY KEY,
+                nombre VARCHAR(100),
+                username VARCHAR(50),
+                email VARCHAR(100) UNIQUE,
+                password VARCHAR(255),
+                foto_perfil VARCHAR(255)
+            );
 
+            CREATE TABLE IF NOT EXISTS Historial (
+                id SERIAL PRIMARY KEY,
+                id_del_usuario INT,
+                NombreUsuario VARCHAR(100),
+                peso DECIMAL(5,2),
+                altura DECIMAL(5,2),
+                ResultadoIMC DECIMAL(5,2),
+                Estado VARCHAR(50),
+                fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE OR REPLACE FUNCTION fn_CalcularEstadoIMC(imc numeric)
+            RETURNS varchar AS $$
+            BEGIN
+                IF imc < 18.5 THEN RETURN 'Bajo peso';
+                ELSIF imc < 25.0 THEN RETURN 'Normal';
+                ELSIF imc < 30.0 THEN RETURN 'Sobrepeso';
+                ELSE RETURN 'Obesidad';
+                END IF;
+            END;
+            $$ LANGUAGE plpgsql;
+
+            CREATE OR REPLACE PROCEDURE sp_GuardarHistorial(
+                p_id_usuario INT, p_nombre VARCHAR, p_peso NUMERIC, p_altura NUMERIC, p_imc NUMERIC, p_estado VARCHAR
+            )
+            LANGUAGE plpgsql AS $$
+            BEGIN
+                INSERT INTO Historial (id_del_usuario, NombreUsuario, peso, altura, ResultadoIMC, Estado)
+                VALUES (p_id_usuario, p_nombre, p_peso, p_altura, p_imc, p_estado);
+            END;
+            $$;
+        `);
+        res.send("<h1 style='color:green;'>¡Misión Cumplida! Tablas creadas con éxito 🚀</h1><p>Ya puedes regresar a la página principal y registrarte.</p>");
+    } catch (error) {
+        res.send("<h1 style='color:red;'>Hubo un error:</h1><p>" + error.message + "</p>");
+    }
+});
 // --- CAMBIO PARA EL SERVIDOR: PUERTO DINÁMICO ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor en http://localhost:${PORT}`));
