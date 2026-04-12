@@ -1,0 +1,124 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background-color: #F5F5F5; 
+    color: #333;
+}
+
+
+.navbar {
+    background-color: #E8E8E8; 
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #C0C0C0; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #800020; 
+    letter-spacing: 1px;
+}
+
+.nav-buttons a {
+    text-decoration: none;
+    background-color: #800020; 
+    color: #C0C0C0; 
+    padding: 10px 20px;
+    margin-left: 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    border: 1px solid #B0B0B0;
+    transition: all 0.3s ease;
+}
+
+.nav-buttons a:hover {
+    background-color: #660000;
+    color: #FFFFFF; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+
+.container {
+    max-width: 450px;
+    margin: 60px auto;
+    background: #FFFFFF;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border: 1px solid #C0C0C0;
+    text-align: center;
+}
+
+h2 {
+    color: #800020;
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+}
+
+/* FORMULARIO */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #C0C0C0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    background-color: #FAFAFA;
+    font-size: 16px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #800020;
+    box-shadow: 0 0 5px rgba(128, 0, 32, 0.2);
+}
+
+.calc-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #800020; 
+    color: #C0C0C0; 
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.calc-btn:hover {
+    background-color: #660000;
+    color: #FFFFFF;
+}
+
+
+.resultado-box {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #E8E8E8;
+    border-radius: 10px;
+    border-left: 6px solid #800020;
+}
+
+.resultado-text {
+    font-size: 1.2rem;
+    color: #800020;
+    font-weight: bold;
+    margin: 0;
+}

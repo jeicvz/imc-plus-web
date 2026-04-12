@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preguntas Frecuentes - IMC+</title>
+    <link rel="icon" type="image/png" href="/css/images/icon.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        /* RESET Y FONDO DEGRADADO CLARO */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #F1F5F9 100%); 
+            color: #1E293B;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-weight: 500;
+            /* Dejamos el espacio arriba asumiendo que tu partial de navbar mide 120px fijos */
+            padding-top: 120px; 
+            scroll-behavior: smooth;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL FAQ --- */
+        .container-faq { 
+            max-width: 1000px; 
+            margin: 40px auto 60px auto; 
+            background: #FFFFFF; 
+            border: 1px solid #E2E8F0; 
+            border-radius: 25px; 
+            padding: 50px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+            animation: fadeIn 0.8s ease;
+            position: relative;
+            z-index: 5;
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        header { 
+            text-align: center;
+            margin-bottom: 30px; 
+            border-bottom: 2px solid #F1F5F9; 
+            padding-bottom: 25px;
+        }
+
+        .title-group h1 { 
+            font-size: 2.2rem; 
+            font-weight: 900; 
+            color: #0F172A; 
+            margin: 0; 
+            text-transform: uppercase; 
+            letter-spacing: -0.5px; 
+        }
+
+        /* BOTÓN EXPANDIR */
+        .btn-expand { 
+            background: #0F172A; 
+            color: #ffffff; 
+            font-weight: 800; 
+            border: 2px solid #0F172A; 
+            padding: 12px 25px; 
+            border-radius: 12px; 
+            transition: all 0.3s ease; 
+            margin-bottom: 25px; 
+            cursor: pointer; 
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-expand:hover { 
+            background: #38BDF8; 
+            color: #0F172A; 
+            border-color: #38BDF8;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.4);
+        }
+
+        /* ACORDEONES LIMPIOS ESTILO IMC+ */
+        .accordion-item { 
+            background: #FFFFFF; 
+            border: none;
+            margin-bottom: 15px; 
+            border-radius: 20px !important; 
+            overflow: hidden; 
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .accordion-button { 
+            background-color: #ffffff; 
+            color: #0F172A; 
+            font-weight: 800; 
+            font-size: 1.1rem;
+            padding: 20px 25px; 
+            box-shadow: none !important; 
+            border-radius: 20px !important;
+        }
+
+        .accordion-button:not(.collapsed) { 
+            background-color: #e0e7ff; 
+            color: #0EA5E9; 
+        }
+
+        /* Ajuste del color de la flechita del acordeón */
+        .accordion-button::after { filter: grayscale(1); }
+        .accordion-button:not(.collapsed)::after { filter: invert(0.5) sepia(1) saturate(5) hue-rotate(175deg); }
+
+        .accordion-body { 
+            line-height: 1.7; 
+            color: #1E293B; 
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-top: 1px solid #F1F5F9; 
+            background-color: #FFFFFF;
+            padding: 25px;
+        }
+
+        /* --- RESPONSIVIDAD --- */
+        @media (max-width: 768px) {
+            body { padding-top: 130px; } /* Ajuste de navbar en móviles */
+            
+            .container-faq { margin: 20px 15px; padding: 30px 20px; border-radius: 20px; }
+            .title-group h1 { font-size: 1.6rem; }
+            
+            .btn-expand { width: 100%; padding: 12px; font-size: 0.85rem; display: block; }
+            
+            .accordion-button { padding: 15px 20px; font-size: 1rem; }
+            .accordion-body { padding: 20px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('partials/navbar') %>
+
+    <div class="container-faq">
+        <header>
+            <div class="title-group">
+                <h1>Preguntas frecuentes sobre el IMC</h1>
+            </div>
+        </header>
+
+        <main>
+            <button class="btn-expand" id="btnExpandAll">EXPANDIR TODO</button>
+
+            <div class="accordion" id="accordionFAQ">
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            ¿Cómo se debe usar el IMC correctamente?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            El IMC se utiliza como una herramienta inicial de detección para identificar posibles riesgos de salud relacionados con el peso. <strong>No es una herramienta de diagnóstico médico definitivo.</strong> Si tu IMC sale fuera del rango normal, es recomendable consultar a un profesional de la salud para realizar evaluaciones adicionales como revisar tu porcentaje de grasa, historial médico y hábitos.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            ¿A partir de qué edad es confiable usar esta calculadora?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            Nuestra calculadora y los rangos de clasificación estándar de la OMS están diseñados <strong>para adultos de 20 años en adelante.</strong> Para niños y adolescentes (de 2 a 19 años), el IMC se calcula con la misma fórmula, pero se interpreta de manera diferente utilizando tablas de percentiles que toman en cuenta la edad y el sexo, ya que su composición corporal cambia constantemente durante el crecimiento.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            ¿El IMC es igual de preciso para hombres y mujeres?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            Sí, matemáticamente el cálculo y los rangos de clasificación son idénticos para ambos. Sin embargo, biológicamente las mujeres suelen tener un mayor porcentaje de grasa corporal que los hombres con el mismo nivel de IMC. Por eso, al momento de hacer una evaluación médica profunda, tu doctor tomará en cuenta tu género y composición corporal.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            ¿Existen otras formas de medir mi salud física además del IMC?
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            ¡Absolutamente! El IMC es solo una pieza del rompecabezas. Otros métodos excelentes para evaluar tu estado físico incluyen:
+                            <br><br>
+                            • <strong>Circunferencia de la cintura:</strong> Excelente para medir la grasa visceral (la que rodea los órganos).<br>
+                            • <strong>Porcentaje de grasa corporal:</strong> Medido con básculas de bioimpedancia o plicómetros.<br>
+                            • <strong>Análisis de sangre:</strong> Para revisar niveles reales de salud como glucosa, colesterol y triglicéridos.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                            ¿Por qué mi peso e IMC varían de un día para otro?
+                        </button>
+                    </h2>
+                    <div id="faq5" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            Es completamente normal. Tu peso puede fluctuar entre 1 y 2 kilos en un solo día. Esto no significa que hayas ganado grasa; suele deberse a la <strong>retención de líquidos</strong> (por consumir más sodio o carbohidratos), cambios hormonales, hidratación, o el tránsito intestinal. Se recomienda pesarse solo una vez a la semana, siempre a la misma hora y bajo las mismas condiciones (preferiblemente por la mañana en ayunas).
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                            ¿Cuáles son los riesgos reales de mantener un IMC en categoría de Obesidad?
+                        </button>
+                    </h2>
+                    <div id="faq6" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            Mantener un IMC superior a 30 por períodos prolongados aumenta significativamente el riesgo de desarrollar enfermedades crónicas, tales como enfermedades coronarias, diabetes tipo 2, hipertensión arterial, accidentes cerebrovasculares, apnea del sueño, problemas osteoarticulares severos y diversos tipos de cáncer. Tomar acción hoy puede revertir muchos de estos riesgos.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // LÓGICA DE LOS BOTONES DEL ACORDEÓN
+        const btnExpand = document.getElementById('btnExpandAll');
+        const accordionItems = document.querySelectorAll('.accordion-collapse');
+        const accordionButtons = document.querySelectorAll('.accordion-button');
+        let allExpanded = false;
+
+        btnExpand.addEventListener('click', () => {
+            allExpanded = !allExpanded;
+            accordionItems.forEach((item, index) => {
+                const bsCollapse = new bootstrap.Collapse(item, { toggle: false });
+                if (allExpanded) { 
+                    bsCollapse.show(); 
+                    accordionButtons[index].classList.remove('collapsed'); 
+                } else { 
+                    bsCollapse.hide(); 
+                    accordionButtons[index].classList.add('collapsed'); 
+                }
+            });
+            btnExpand.innerText = allExpanded ? "CONTRAER TODO" : "EXPANDIR TODO";
+        });
+    </script>
+</body>
+</html>

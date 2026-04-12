@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pirámide de Salud | IMC+</title>
+    <link rel="icon" type="image/png" href="/css/images/icon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* ESTILOS BASE Y FONDO DEGRADADO */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #F1F5F9 100%); 
+            color: #1E293B;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-weight: 500;
+            padding-top: 120px; 
+        }
+
+        /* --- CONTENEDOR DE NAVBAR FIJO --- */
+        .header-fixed-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1001; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+        }
+
+        /* NAVBAR PRINCIPAL */
+        .navbar { 
+            background-color: #0F172A; 
+            padding: 0 60px; 
+            height: 70px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .logo img { height: 45px; }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+            min-width: 200px;
+        }
+
+        .nav-profile-img {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .user-name { 
+            color: #F1F5F9; 
+            font-weight: 600; 
+            margin-right: 15px; 
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        /* ESTILOS NOMBRES PC */
+        .user-real-name { display: inline-block; }
+        .user-username { display: none; }
+
+        /* BOTÓN CONFIGURACIÓN */
+        .btn-config {
+            background: transparent;
+            border: 1px solid #FFFFFF; 
+            color: #FFFFFF; 
+            font-size: 1.2rem;
+            padding: 5px 12px;
+            border-radius: 8px;
+            transition: 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-config:hover {
+            background: rgba(255, 255, 255, 0.1); 
+            color: #38BDF8; 
+            border-color: #38BDF8; 
+        }
+
+        /* MENÚ DESPLEGABLE DE USUARIO */
+        .dropdown-menu {
+            background-color: #1E293B;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border-radius: 12px;
+            min-width: 220px;
+        }
+        
+        .dropdown-item-custom {
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background-color: #0f172a; 
+            color: #F1F5F9;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-sizing: border-box;
+        }
+        .dropdown-item-custom:last-child { margin-bottom: 0; }
+        .dropdown-item-custom:hover {
+            background-color: #38BDF8; 
+            color: #0F172A !important;
+            border-color: #38BDF8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        /* BOTONES DE INICIAR SESIÓN Y REGISTRO */
+        .btn-nav-custom {
+            display: inline-block; text-align: center; font-weight: 800; font-size: 0.85rem;
+            padding: 9px 20px; border-radius: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px;
+            background-color: #0f172a; color: #F1F5F9 !important; border: 1px solid rgba(56, 189, 248, 0.2);
+            box-sizing: border-box; cursor: pointer;
+        }
+        .btn-nav-custom:hover {
+            background-color: #38BDF8; color: #0F172A !important; border-color: #38BDF8;
+            transform: translateY(-2px); box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        /* SUB-NAVBAR */
+        .sub-navbar { 
+            background-color: #131C34; border-top: none; padding: 0 60px; height: 50px; 
+        }
+        .sub-nav-container { 
+            max-width: 1400px; height: 100%; margin: 0 auto; display: flex; gap: 40px; 
+            justify-content: flex-end; align-items: center;
+        }
+        .sub-link { 
+            color: #FFFFFF; text-decoration: none; font-size: 0.85rem; font-weight: 500; 
+            letter-spacing: 0.5px; text-transform: uppercase; transition: 0.3s; position: relative;
+            opacity: 1; display: inline-block; white-space: nowrap; 
+        }
+        .sub-link::after {
+            content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0;
+            background-color: #43c7ff; transition: 0.3s;
+        }
+        .sub-link:hover, .active-link { color:#43c7ff !important; text-decoration: none; opacity: 1 !important; }
+        .sub-link:hover::after, .active-link::after { width: 100% !important; }
+
+        /* MENÚ DESPLEGABLE DE ALIMENTACIÓN */
+        .nav-item-dropdown { position: relative; display: inline-flex; align-items: center; height: 100%; }
+        .nav-item-dropdown::before { content: ""; position: absolute; top: 100%; left: 0; width: 100%; height: 15px; display: none; }
+        .nav-item-dropdown:hover::before { display: block; }
+
+        .dropdown-content {
+            display: none; position: absolute; background-color: #1E293B; padding: 15px;
+            min-width: 220px; right: 0; top: 100%; z-index: 1002;
+            border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-radius: 12px;
+        }
+        .dropdown-content a {
+            display: block; width: 100%; text-align: center; font-weight: 800; font-size: 0.85rem;
+            padding: 10px 15px; border-radius: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;
+            background-color: #0f172a; color: #FFFFFF; border: 1px solid rgba(56, 189, 248, 0.2); box-sizing: border-box;
+        }
+        .dropdown-content a:last-child { margin-bottom: 0; }
+        .dropdown-content a:hover, .dropdown-content a.active-link { 
+            background-color: #38BDF8; color: #0F172A !important; border-color: #38BDF8;
+            transform: translateY(-2px); box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+        .nav-item-dropdown:hover .dropdown-content { display: block; }
+
+        /* --- CONTENIDO PRINCIPAL: PIRÁMIDE --- */
+        .main-container {
+            max-width: 1000px; margin: 40px auto 60px auto; padding: 50px;
+            background: #FFFFFF; border-radius: 25px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease; position: relative; z-index: 5;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hero-title { font-size: 3.2rem; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 4px; color: #0f172a; margin-bottom: 5px; }
+        .glow-line { height: 4px; width: 100px; background: #38BDF8; margin: 20px auto 40px; border-radius: 10px; }
+        .content-box { line-height: 1.9; font-size: 1.15rem; text-align: center; margin-bottom: 40px; }
+        .highlight-text { color: #0f172a; font-weight: 800; }
+        .image-wrapper { background: #f8fafc; padding: 20px; border-radius: 20px; border: 2px solid #E2E8F0; margin: 40px 0; transition: 0.4s; text-align: center; }
+        .image-wrapper:hover { transform: translateY(-5px); border-color: #38BDF8; box-shadow: 0 10px 25px rgba(56, 189, 248, 0.2); }
+        .piramide-img { max-width: 100%; height: auto; border-radius: 12px; display: block; margin: 0 auto; }
+        .footer-text { margin-top: 40px; padding: 25px; background: #F8FAFC; border-radius: 15px; font-size: 1.05rem; border-left: 5px solid #38BDF8; color: #1E293B; }
+
+        /* --- RESPONSIVIDAD GENERAL --- */
+        @media (max-width: 768px) {
+            body { padding-top: 130px; }
+            .navbar { padding: 10px 15px; height: 70px; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: center; }
+            .logo img { height: 30px; } 
+            .nav-buttons { min-width: auto; gap: 5px; }
+
+            /* ESTILOS NOMBRES MÓVIL */
+            .user-real-name { display: none !important; } 
+            .user-username { display: inline-block !important; font-size: 0.85rem; margin-right: 8px; }
+
+            .btn-nav-custom { padding: 6px 10px; font-size: 0.7rem; margin-right: 0 !important; }
+
+            /* AJUSTES SCROLL MÓVIL */
+            .sub-navbar { padding: 0; height: auto; overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+            .sub-nav-container { justify-content: flex-start; gap: 25px; padding: 15px 20px; width: max-content; }
+            .nav-item-dropdown { position: static; } 
+            .dropdown-content { left: 0; right: 0; width: 100%; top: 100%; border-radius: 0 0 12px 12px; }
+
+            .main-container { margin: 20px 15px; padding: 30px 20px; }
+            .hero-title { font-size: 2rem; letter-spacing: 2px;}
+            .content-box { font-size: 1rem; }
+            .image-wrapper { padding: 10px; }
+            .footer-text { font-size: 0.95rem; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-fixed-container">
+        <nav class="navbar">
+            <div class="logo">
+                <a href="/"><img src="/css/images/logo.png" alt="IMC Plus Logo"></a>
+            </div>
+            <div class="nav-buttons">
+                <% if (usuario) { %>
+                    <img src="<%= (foto && foto !== '') ? foto : '/css/images/nopic.jpg' %>" class="nav-profile-img" alt="Avatar">
+                    
+                    <span class="user-name user-real-name"><%= (typeof nombre !== 'undefined' && nombre) ? nombre : usuario %></span>
+                    <span class="user-name user-username"><%= usuario %></span>
+                    
+                    <div class="dropdown">
+                        <button class="btn-config" type="button" data-bs-toggle="dropdown" aria-expanded="false">☰</button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item-custom" href="/editar-perfil">Editar Perfil</a></li>
+                            <li><a class="dropdown-item-custom" href="javascript:void(0)" onclick="confirmarCerrarSesionNav()">Cerrar Sesión</a></li>
+                        </ul>
+                    </div>
+                <% } else { %>
+                    <a href="/login" class="btn-nav-custom" style="margin-right: 10px;">Iniciar Sesión</a>
+                    <a href="/registro" class="btn-nav-custom">Registrarse</a>
+                <% } %>
+            </div>
+        </nav>
+
+        <div class="sub-navbar" id="scrollableSubNav">
+            <div class="sub-nav-container">
+                <a href="/" class="sub-link">INICIO</a>
+                <a href="/#calculadora" class="sub-link">CALCULADORA IMC</a>
+                <a href="/#habitos" class="sub-link">HÁBITOS RECOMENDADOS</a>
+                <% if (usuario) { %>
+                    <a href="/historial" class="sub-link">Historial de mis cálculos</a>
+                <% } %>
+                <a href="/datos-obesidad" class="sub-link">Datos Obesidad</a>
+                <a href="/faq" class="sub-link">Preguntas Frecuentes</a>
+                
+                <div class="nav-item-dropdown">
+                    <a href="#" class="sub-link" id="link-alimentacion">ALIMENTACIÓN</a>
+                    <div class="dropdown-content">
+                        <a href="/piramide-salud">Pirámide de salud</a>
+                        <a href="/alimentos-recomendados">R. Generales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-container">
+            <h1 class="hero-title">PIRÁMIDE DE SALUD</h1>
+            <div class="glow-line"></div>
+
+            <div class="content-box">
+                <p style="color: #1E293B; font-weight: 600;">
+                    ¿Te has preguntado qué alimentos deberías consumir con mayor frecuencia durante la semana? ¿O cómo lograr un equilibrio adecuado entre <span class="highlight-text">carbohidratos, proteínas y vitaminas</span>?
+                </p>
+                <p style="color: #0EA5E9; font-weight: 700; margin-top: 15px;">
+                    A continuación, encontrarás una pirámide de vida saludable que te ayudará a mejorar tu alimentación y complementarla con actividad física. No se trata solo de comer, sino de mantener un balance adecuado entre todos los nutrientes dentro de tu estilo de vida en <span style="color: #0F172A; font-weight: 800;">IMC+</span>.
+                </p>
+            </div>
+
+            <div class="image-wrapper">
+                <img src="/css/images/piramidesalud.jpg" alt="Pirámide de Salud" class="piramide-img">
+            </div>
+
+            <div class="footer-text">
+                <p>
+                    <strong style="color: #0F172A;">Recuerda:</strong> una buena alimentación comienza con información. Esta guía visual te orientará para priorizar alimentos naturales, incorporar grasas saludables y mantener una correcta hidratación en tu día a día.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmarCerrarSesionNav() {
+            Swal.fire({
+                title: '¿Estás seguro que quieres salir de tu cuenta de IMC+?',
+                text: "Al hacer esto no se guardarán tus cálculos. Cualquier medición que realices sin iniciar sesión no quedará registrada en tu historial para darle seguimiento.",
+                icon: 'warning',
+                iconColor: '#ffffff',
+                showCancelButton: true,
+                background: '#0f172a',
+                color: '#fff',
+                confirmButtonColor: '#2563EB',
+                cancelButtonColor: '#e74c3c',
+                confirmButtonText: 'Sí, salir',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/logout';
+                }
+            });
+        }
+
+        function actualizarEnlacesActivos() {
+            const currentPath = window.location.pathname;
+            const currentHash = window.location.hash;
+            const links = document.querySelectorAll('.sub-link, .dropdown-content a');
+
+            links.forEach(link => {
+                link.classList.remove('active-link');
+                const linkHref = link.getAttribute('href');
+
+                if (currentHash && linkHref.includes(currentHash)) {
+                    link.classList.add('active-link');
+                } else if (currentPath !== "/" && linkHref === currentPath) {
+                    link.classList.add('active-link');
+                    if (link.closest('.dropdown-content')) {
+                        document.getElementById('link-alimentacion').classList.add('active-link');
+                    }
+                } else if (currentPath === "/" && currentHash === "" && linkHref === "/") {
+                    link.classList.add('active-link');
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            actualizarEnlacesActivos();
+
+            // --- MAGIA DEL SCROLL ---
+            const subNav = document.getElementById('scrollableSubNav');
+            if (subNav) {
+                const savedScrollPos = sessionStorage.getItem('subNavScrollPosition');
+                if (savedScrollPos) {
+                    subNav.scrollLeft = parseInt(savedScrollPos, 10);
+                }
+
+                subNav.addEventListener('scroll', () => {
+                    sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
+                });
+            }
+        });
+
+        window.addEventListener("hashchange", actualizarEnlacesActivos);
+
+        document.querySelectorAll('a[href^="/#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const subNav = document.getElementById('scrollableSubNav');
+                if (subNav) sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
+                
+                if (window.location.pathname === "/") {
+                    setTimeout(actualizarEnlacesActivos, 10);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

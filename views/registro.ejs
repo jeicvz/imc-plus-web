@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - IMC+</title>
+    <link rel="icon" type="image/png" href="/css/images/icon.png">
+    
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+            height:100vh;
+            /* Fondo neutro oscuro para el efecto de cristal */
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/css/images/logbackground.png') no-repeat center center fixed;
+            background-size:cover;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            overflow:hidden;
+        }
+        
+        @keyframes loginFade { from{opacity:0;transform:translateY(40px);} to{opacity:1;transform:translateY(0);} }
+        @keyframes pulse { 0%{opacity:0.1} 50%{opacity:0.25} 100%{opacity:0.1} }
+        
+        .pulse-bg { position:fixed; width:500px; height:500px; background:radial-gradient(circle,#38BDF8,transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%); filter:blur(120px); animation:pulse 4s infinite; z-index:-2; }
+        
+        /* Botón Regresar con Borde Blanco (Consistente con las demás vistas) */
+        .btn-regresar { 
+            position:absolute; 
+            top:30px; 
+            left:30px; 
+            padding:8px 16px; 
+            border: 2px solid #ffffff; 
+            color: #ffffff; 
+            border-radius:8px; 
+            text-decoration:none; 
+            font-weight:700; 
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition:0.3s; 
+            z-index: 10;
+            background: transparent;
+        }
+        .btn-regresar:hover { 
+            background: rgba(255, 255, 255, 0.1); 
+            color:#0EA5E9; 
+            border-color: #0EA5E9;
+            transform:translateX(-5px); 
+        }
+        
+        /* Tarjeta Glassmorphism Premium */
+        .login-card { 
+            background: rgba(15, 23, 42, 0.7); 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            padding:55px; 
+            border-radius:22px; 
+            width: 100%; 
+            max-width: 480px; 
+            text-align:center; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            animation:loginFade 0.6s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            margin: 0 20px;
+        }
+        
+        .form-title { color:white; font-size:2rem; font-weight:900; margin-bottom:5px; }
+        .subtitle-text { color:#38BDF8; font-size:0.9rem; font-weight:700; margin-bottom:25px; }
+        
+        /* ALERTAS */
+        #success-alert, #error-alert {
+            display: none;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            font-weight: 700;
+            font-size: 0.9rem;
+            animation: loginFade 0.4s ease;
+        }
+
+        #success-alert {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10B981;
+            color: #34D399;
+        }
+
+        #error-alert {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #EF4444;
+            color: #FCA5A5;
+        }
+
+        .input-group { position:relative; margin-bottom:25px; width: 100%; }
+        
+        /* Inputs oscuros para el cristal */
+        .input-group input { width:100%; padding:16px 14px; border-radius:10px; border:1px solid #1E293B; background:#0F172A; color:white; font-weight:600; outline:none; transition:0.3s; font-size: 1rem;}
+        .input-group input:focus { border-color:#0EA5E9; box-shadow:0 0 0 4px rgba(14, 165, 233, 0.1); }
+        
+        .input-group label { position:absolute; left:14px; top:16px; color:#94A3B8; font-size:14px; transition:0.3s; pointer-events:none; }
+        .input-group input:focus + label, .input-group input:not(:placeholder-shown) + label { top:-8px; left:12px; background:#0F172A; padding:0 6px; font-size:12px; color:#0EA5E9; font-weight: 700; border-radius: 4px; }
+        
+        .btn-login { width:100%; padding:16px; background:#0EA5E9; border:none; border-radius:10px; color:white; font-weight:800; font-size:16px; cursor:pointer; transition:0.3s; margin-top:5px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-login:hover { background: #0284c7; transform:translateY(-2px); box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3); }
+        
+        .footer-links { width: 100%; margin-top: 20px; }
+        .footer-links a { color:#0EA5E9; text-decoration:none; font-weight:800; display:inline-block; transition: 0.3s;}
+        .footer-links a:hover { color: #0284c7; text-decoration: underline; }
+
+        /* RESPONSIVO */
+        @media(max-width: 480px) {
+            .login-card { padding: 35px 20px; border-radius: 16px; }
+            .form-title { font-size: 1.6rem; }
+            .input-group input { padding: 14px 12px; }
+            .btn-login { padding: 14px; }
+            .btn-regresar { top: 20px; left: 20px; font-size: 0.85rem; padding: 6px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="pulse-bg"></div>
+
+<a href="/" class="btn-regresar">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+    </svg>
+    Regresar
+</a>
+
+<div class="login-card">
+    <h2 class="form-title">ÚNETE A IMC+</h2>
+    <p class="subtitle-text">Crea tu cuenta hoy y comienza a llevar un control preciso de tu salud.</p>
+
+    <div id="success-alert">¡Cuenta creada con éxito! Redirigiendo al login...</div>
+    <div id="error-alert">Este correo ya está registrado con otra cuenta, por favor intente con otro correo.</div>
+
+    <form id="registroForm" style="width: 100%;">
+        <div class="input-group">
+            <input type="text" name="nombre" id="nombre" placeholder=" " required>
+            <label>Nombre completo</label>
+        </div>
+        <div class="input-group">
+            <input type="email" name="email" id="email" placeholder=" " required>
+            <label>Correo electrónico</label>
+        </div>
+        <div class="input-group">
+            <input type="password" name="password" id="password" placeholder=" " required>
+            <label>Crea una contraseña</label>
+        </div>
+        <button type="submit" class="btn-login" id="btnSubmit">CREAR CUENTA</button>
+    </form>
+
+    <div class="footer-links">
+        <div style="color:#94A3B8; font-size:14px;">
+            ¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('registroForm');
+    const successAlert = document.getElementById('success-alert');
+    const errorAlert = document.getElementById('error-alert');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        successAlert.style.display = 'none';
+        errorAlert.style.display = 'none';
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "PROCESANDO...";
+
+        const formData = {
+            nombre: document.getElementById('nombre').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+        };
+
+        try {
+            const response = await fetch('/registrar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                successAlert.style.display = 'block';
+                form.style.opacity = '0.3';
+                form.style.pointerEvents = 'none';
+                setTimeout(() => { window.location.href = '/login'; }, 2000);
+            } else {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "CREAR CUENTA";
+                
+                if (result.code === 'EMAIL_EXISTS' || (result.message && result.message.includes("registrado"))) {
+                    errorAlert.style.display = 'block';
+                } else {
+                    alert("Error: " + (result.message || "No se pudo completar el registro"));
+                }
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "CREAR CUENTA";
+            alert("Error de conexión con el servidor");
+        }
+    };
+</script>
+
+</body>
+</html>

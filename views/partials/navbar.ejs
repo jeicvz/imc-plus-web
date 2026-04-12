@@ -1,0 +1,272 @@
+<style>
+    /* CONTENEDOR PRINCIPAL FIJO */
+    .header-fixed-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1001;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+    }
+
+    body {
+        padding-top: 120px; 
+    }
+
+    /* NAVBAR PRINCIPAL */
+    .navbar { 
+        background-color: #0F172A; 
+        padding: 0 60px; 
+        height: 70px; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+    }
+    .logo img { height: 45px; }
+
+    .nav-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        height: 100%;
+        min-width: 200px;
+    }
+
+    .nav-profile-img {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+
+    /* --- ESTILOS DE NOMBRE DINÁMICO --- */
+    .user-name { 
+        color: #F1F5F9; 
+        font-weight: 600; 
+        margin-right: 15px; 
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    /* 1. EN PC (Pantalla grande): Mostramos nombre real, ocultamos username */
+    .user-real-name { display: inline-block; }
+    .user-username { display: none; }
+
+    /* BOTÓN CONFIGURACIÓN */
+    .btn-config {
+        background: transparent;
+        border: 1px solid #FFFFFF; 
+        color: #FFFFFF; 
+        font-size: 1.2rem;
+        padding: 5px 12px;
+        border-radius: 8px;
+        transition: 0.3s;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-config:hover {
+        background: rgba(255, 255, 255, 0.1); 
+        color: #38BDF8; 
+        border-color: #38BDF8; 
+    }
+
+    /* MENÚ DESPLEGABLE DE USUARIO */
+    .dropdown-menu {
+        background-color: #1E293B;
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        border-radius: 12px;
+        min-width: 220px;
+    }
+    
+    .dropdown-item-custom {
+        display: block; width: 100%; text-align: center; font-weight: 800; font-size: 0.85rem;
+        padding: 10px 15px; border-radius: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;
+        background-color: #0f172a; color: #F1F5F9; border: 1px solid rgba(56, 189, 248, 0.2); box-sizing: border-box;
+    }
+    .dropdown-item-custom:last-child { margin-bottom: 0; }
+    .dropdown-item-custom:hover {
+        background-color: #38BDF8; color: #0F172A !important; border-color: #38BDF8;
+        transform: translateY(-2px); box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+    }
+
+    /* BOTONES INICIAR SESIÓN Y REGISTRO */
+    .btn-nav-custom {
+        display: inline-block; text-align: center; font-weight: 800; font-size: 0.85rem;
+        padding: 9px 20px; border-radius: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px;
+        background-color: #0f172a; color: #F1F5F9 !important; border: 1px solid rgba(56, 189, 248, 0.2);
+        box-sizing: border-box; cursor: pointer;
+    }
+    .btn-nav-custom:hover {
+        background-color: #38BDF8; color: #0F172A !important; border-color: #38BDF8;
+        transform: translateY(-2px); box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+    }
+
+    /* SUB-NAVBAR */
+    .sub-navbar { background-color: #131C34; border-top: none; padding: 0 60px; height: 50px; }
+    .sub-nav-container { max-width: 1400px; height: 100%; margin: 0 auto; display: flex; gap: 40px; justify-content: flex-end; align-items: center; }
+    .sub-link { color: #FFFFFF; text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; transition: 0.3s; position: relative; opacity: 1; display: inline-block; white-space: nowrap; }
+    .sub-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: #43c7ff; transition: 0.3s; }
+    .sub-link:hover, .active-link { color:#43c7ff !important; text-decoration: none; opacity: 1 !important; }
+    .sub-link:hover::after, .active-link::after { width: 100% !important; }
+
+    /* MENÚ DESPLEGABLE ALIMENTACIÓN */
+    .nav-item-dropdown { position: relative; display: inline-flex; align-items: center; height: 100%; }
+    .nav-item-dropdown::before { content: ""; position: absolute; top: 100%; left: 0; width: 100%; height: 15px; display: none; }
+    .nav-item-dropdown:hover::before { display: block; }
+    .dropdown-content { display: none; position: absolute; background-color: #1E293B; padding: 15px; min-width: 220px; right: 0; top: 100%; z-index: 1002; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-radius: 12px; }
+    .dropdown-content a { display: block; width: 100%; text-align: center; font-weight: 800; font-size: 0.85rem; padding: 10px 15px; border-radius: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-decoration: none; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #0f172a; color: #FFFFFF; border: 1px solid rgba(56, 189, 248, 0.2); box-sizing: border-box; }
+    .dropdown-content a:last-child { margin-bottom: 0; }
+    .dropdown-content a:hover, .dropdown-content a.active-link { background-color: #38BDF8; color: #0F172A !important; border-color: #38BDF8; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4); }
+    .nav-item-dropdown:hover .dropdown-content { display: block; }
+
+    /* RESPONSIVIDAD */
+    @media (max-width: 768px) {
+        body { padding-top: 130px; }
+        .navbar { padding: 10px 15px; height: 70px; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: center; }
+        .logo img { height: 30px; } 
+        .nav-buttons { min-width: auto; gap: 5px; }
+
+        /* 2. EN MÓVIL: Invertimos la visibilidad de los nombres */
+        .user-real-name { display: none !important; } 
+        .user-username { display: inline-block !important; font-size: 0.85rem; margin-right: 8px; }
+
+        .btn-nav-custom { padding: 6px 10px; font-size: 0.7rem; margin-right: 0 !important; }
+        
+        /* Agregado smooth scroll para que se vea suave si tiene que moverse */
+        .sub-navbar { padding: 0; height: auto; overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .sub-nav-container { justify-content: flex-start; gap: 25px; padding: 15px 20px; width: max-content; }
+        
+        .nav-item-dropdown { position: static; } 
+        .dropdown-content { left: 0; right: 0; width: 100%; top: 100%; border-radius: 0 0 12px 12px; }
+    }
+</style>
+
+<div class="header-fixed-container">
+    <nav class="navbar">
+        <div class="logo">
+            <a href="/"><img src="/css/images/logo.png" alt="IMC Plus Logo"></a>
+        </div>
+        <div class="nav-buttons">
+            <% if (usuario) { %>
+                <img src="<%= (foto && foto !== '') ? foto : '/css/images/nopic.jpg' %>" class="nav-profile-img" alt="Avatar">
+                
+                <span class="user-name user-real-name"><%= (typeof nombre !== 'undefined' && nombre) ? nombre : usuario %></span>
+                <span class="user-name user-username"><%= usuario %></span>
+                
+                <div class="dropdown">
+                    <button class="btn-config" type="button" data-bs-toggle="dropdown" aria-expanded="false">☰</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item-custom" href="/editar-perfil">Editar Perfil</a></li>
+                        <li><a class="dropdown-item-custom" href="javascript:void(0)" onclick="confirmarCerrarSesionNav()">Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            <% } else { %>
+                <a href="/login" class="btn-nav-custom" style="margin-right: 10px;">Iniciar Sesión</a>
+                <a href="/registro" class="btn-nav-custom">Registrarse</a>
+            <% } %>
+        </div>
+    </nav>
+
+    <div class="sub-navbar" id="scrollableSubNav">
+        <div class="sub-nav-container">
+            <a href="/" class="sub-link">INICIO</a>
+            <a href="/#calculadora" class="sub-link">CALCULADORA IMC</a>
+            <a href="/#habitos" class="sub-link">HÁBITOS RECOMENDADOS</a>
+            <% if (usuario) { %>
+                <a href="/historial" class="sub-link">Historial de mis cálculos</a>
+            <% } %>
+            <a href="/datos-obesidad" class="sub-link">Datos Obesidad</a>
+            <a href="/faq" class="sub-link">Preguntas Frecuentes</a>
+            
+            <div class="nav-item-dropdown">
+                <a href="#" class="sub-link" id="link-alimentacion">ALIMENTACIÓN</a>
+                <div class="dropdown-content">
+                    <a href="/piramide-salud">Pirámide de salud</a>
+                    <a href="/alimentos-recomendados">R. Generales</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmarCerrarSesionNav() {
+        Swal.fire({
+            title: '¿Estás seguro que quieres salir de tu cuenta de IMC+?',
+            text: "Al hacer esto no se guardarán tus cálculos. Cualquier medición que realices sin iniciar sesión no quedará registrada en tu historial para darle seguimiento.",
+            icon: 'warning',
+            iconColor: '#ffffff',
+            showCancelButton: true,
+            background: '#0f172a',
+            color: '#fff',
+            confirmButtonColor: '#2563EB',
+            cancelButtonColor: '#e74c3c',
+            confirmButtonText: 'Sí, salir',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/logout';
+            }
+        });
+    }
+
+    function actualizarEnlacesActivos() {
+        const currentPath = window.location.pathname;
+        const currentHash = window.location.hash;
+        const links = document.querySelectorAll('.sub-link, .dropdown-content a');
+
+        links.forEach(link => {
+            link.classList.remove('active-link');
+            const linkHref = link.getAttribute('href');
+
+            if (currentHash && linkHref.includes(currentHash)) {
+                link.classList.add('active-link');
+            } else if (currentPath !== "/" && linkHref === currentPath) {
+                link.classList.add('active-link');
+                if (link.closest('.dropdown-content')) {
+                    document.getElementById('link-alimentacion').classList.add('active-link');
+                }
+            } else if (currentPath === "/" && currentHash === "" && linkHref === "/") {
+                link.classList.add('active-link');
+            }
+        });
+    }
+
+    // --- MAGIA PARA GUARDAR LA POSICIÓN DEL SCROLL EN MÓVILES ---
+    document.addEventListener("DOMContentLoaded", () => {
+        actualizarEnlacesActivos();
+
+        const subNav = document.getElementById('scrollableSubNav');
+        
+        // 1. Cuando cargue la página, revisamos si había una posición guardada
+        const savedScrollPos = sessionStorage.getItem('subNavScrollPosition');
+        if (savedScrollPos) {
+            subNav.scrollLeft = parseInt(savedScrollPos, 10);
+        }
+
+        // 2. Cada vez que muevas la barrita con el dedo, guardamos la posición
+        subNav.addEventListener('scroll', () => {
+            sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
+        });
+
+        // 3. Justo antes de darle clic a un ancla, re-guardamos por si acaso
+        document.querySelectorAll('a[href^="/#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
+                if (window.location.pathname === "/") {
+                    setTimeout(actualizarEnlacesActivos, 10);
+                }
+            });
+        });
+    });
+
+    window.addEventListener("hashchange", actualizarEnlacesActivos);
+</script>

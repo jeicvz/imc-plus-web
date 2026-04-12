@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil | IMC+</title>
+    <link rel="icon" type="image/png" href="/css/images/icon.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Fondo con tu imagen y filtro oscuro (igual que login) */
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/css/images/logbackground.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #F1F5F9;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-weight: 500;
+            padding-top: 100px; /* Espacio para la navbar */
+        }
+
+        /* --- CONTENEDOR ESTILO CRISTAL (Glassmorphism) --- */
+        .container-main { 
+            max-width: 700px; 
+            margin: 30px auto 60px auto; 
+            background: rgba(15, 23, 42, 0.7); 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-radius: 20px; 
+            padding: 50px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); 
+            animation: fadeUp 0.6s ease; 
+            position: relative;
+            z-index: 5;
+        }
+
+        @keyframes fadeUp { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        header { 
+            text-align: center;
+            margin-bottom: 30px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            padding-bottom: 25px;
+        }
+
+        .title-group h1 { 
+            font-size: 2.2rem; 
+            font-weight: 900; 
+            color: #ffffff; 
+            margin: 0; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        /* Avatar (Sin borde celeste) */
+        .avatar-preview { 
+            width: 140px; 
+            height: 140px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            margin-bottom: 20px; 
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        .avatar-preview:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.4);
+        }
+
+        /* --- ESTILOS DE BOTONES --- */
+        .btn-custom-base {
+            font-weight: 800;
+            border-radius: 10px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .btn-style-dark {
+            background: #0EA5E9; 
+            border: 2px solid #0EA5E9;
+            color: white; 
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            margin-top: 15px;
+        }
+        .btn-style-dark:hover {
+            background: #0284C7; 
+            border-color: #0284C7;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-style-celeste {
+            background: #0F172A; 
+            border: 2px solid #38BDF8;
+            color: white; 
+        }
+        .btn-style-celeste:hover {
+            background: #38BDF8; 
+            color: #0F172A; 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-delete-photo {
+            background: transparent; 
+            border: 2px solid #EF4444;
+            color: #EF4444; 
+            font-weight: 800;
+            border-radius: 10px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        .btn-delete-photo:hover { 
+            background: #EF4444; 
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        /* --- INPUTS ESTILO OSCURO (Como en Login) --- */
+        .form-control { 
+            background: #0F172A; 
+            border: 1px solid #1E293B; 
+            color: white; 
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 15px 14px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus { 
+            background: #0F172A; 
+            color: white; 
+            border-color: #0EA5E9; 
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); 
+        }
+
+        .form-control[readonly] {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #94A3B8;
+        }
+
+        label { 
+            margin-bottom: 8px; 
+            display: block; 
+            color: #93C5FD; 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            font-weight: 800; 
+        }
+
+        .fade-out { transition: opacity 0.5s ease; opacity: 0; }
+
+        @media(max-width: 768px) {
+            .container-main { margin: 60px 15px 20px 15px; padding: 30px 20px; }
+            .title-group h1 { font-size: 1.8rem; }
+            .photo-buttons-container { flex-direction: column !important; width: 100%; gap: 10px; }
+            .photo-buttons-container .btn-custom-base, .photo-buttons-container .btn-delete-photo { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('partials/navbar') %>
+
+    <div class="container-main">
+        <header>
+            <div class="title-group">
+                <h1>Configuración de Perfil</h1>
+            </div>
+        </header>
+
+        <main>
+            <% if (success) { %>
+                <div id="successAlert" class="alert text-center" style="font-weight: 800; border-radius: 12px; border: 1px solid #10B981; background: rgba(16, 185, 129, 0.2); color: #34D399;">
+                    ¡Tus cambios han sido guardados con éxito!
+                </div>
+            <% } %>
+
+            <form id="profileForm" action="/actualizar-perfil" method="POST" enctype="multipart/form-data" class="text-start">
+                
+                <div class="text-center mb-5">
+                    <img src="<%= datos.foto_perfil ? datos.foto_perfil : '/css/images/nopic.jpg' %>" class="avatar-preview" id="preview" onclick="document.getElementById('fotoInput').click()">
+                    
+                    <div class="d-flex flex-row justify-content-center align-items-center gap-3 photo-buttons-container">
+                        <label class="btn-custom-base btn-style-celeste mb-0">
+                            <%= datos.foto_perfil ? 'Cambiar Foto' : 'Agregar Foto' %> 
+                            <input type="file" id="fotoInput" name="foto" hidden accept="image/*" onchange="previewImg(this)">
+                        </label>
+                        
+                        <% if (datos.foto_perfil) { %>
+                        <button type="button" class="btn-delete-photo m-0" onclick="confirmDelete()">Eliminar foto actual</button>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label>Nombre de Usuario (Público)</label>
+                    <input type="text" name="username" class="form-control" value="<%= datos.username || '' %>" placeholder="Ej: ElProCalculador" required>
+                    <small style="color: #94A3B8; font-weight: 600; margin-top: 5px; display: block;">Este es el nombre que aparecerá en tu menú de navegación superior.</small>
+                </div>
+
+                <div class="mb-4">
+                    <label>Nombre Real (No editable)</label>
+                    <input type="text" class="form-control shadow-none" value="<%= datos.nombre %>" readonly>
+                </div>
+
+                <div class="mb-4">
+                    <label>Correo Electrónico (No editable)</label>
+                    <input type="text" class="form-control shadow-none" value="<%= datos.email %>" readonly>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn-custom-base btn-style-dark">Guardar Cambios de Perfil</button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <form id="deletePhotoForm" action="/eliminar-foto" method="POST" style="display:none;"></form>
+
+    <script>
+        window.onload = function() {
+            const alert = document.getElementById('successAlert');
+            if (alert) {
+                setTimeout(() => {
+                    alert.classList.add('fade-out');
+                    setTimeout(() => { alert.style.display = 'none'; }, 500);
+                }, 4000);
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('status') === 'photo_deleted') {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Foto eliminada!',
+                    text: 'Tu foto de perfil ha sido removida con éxito.',
+                    background: '#0F172A',
+                    color: '#FFFFFF',
+                    confirmButtonColor: '#0EA5E9'
+                }).then(() => {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                });
+            }
+        };
+
+        function previewImg(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('preview');
+                    preview.src = e.target.result;
+                    
+                    Swal.fire({
+                        title: 'Actualizando tu foto...',
+                        text: 'Estamos subiendo la imagen.',
+                        background: '#0F172A',
+                        color: '#FFFFFF',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        willOpen: () => { Swal.showLoading(); }
+                    });
+
+                    setTimeout(() => { document.getElementById('profileForm').submit(); }, 800); 
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function confirmDelete() {
+            Swal.fire({
+                title: '¿Eliminar tu foto actual?',
+                text: "Se reemplazará por la imagen predeterminada.",
+                icon: 'warning',
+                showCancelButton: true,
+                background: '#0F172A',
+                color: '#FFFFFF',
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: '#334155',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deletePhotoForm').submit();
+                }
+            })
+        }
+    </script>
+</body>
+</html>

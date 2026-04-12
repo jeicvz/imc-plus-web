@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Obesidad | IMC+</title>
+    <link rel="icon" type="image/png" href="/css/images/icon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+   
+    <style>
+        /* --- VARIABLES DEL TEMA --- */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #F1F5F9 100%);
+            --text-main: #1e293b;
+            --card-bg: #ffffff;
+            --container-bg: #ffffff;
+            --border-color: rgba(15, 23, 42, 0.1);
+            --accent-blue: #0EA5E9;
+            --text-dark: #0f172a;
+        }
+
+        /* --- ESTILO GENERAL --- */
+        * { margin:0; padding:0; box-sizing:border-box; }
+       
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .container-main {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 40px;
+            background: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 22px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
+            animation: fadeIn 0.8s ease;
+            position: relative;
+            z-index: 5;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            text-align: center;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .hero-subtitle {
+            text-align: center;
+            color: var(--accent-blue);
+            font-weight: 700;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+            color: var(--text-dark);
+            height: 100%;
+        }
+        .info-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .info-card h3 { color: var(--text-dark); font-size: 1.2rem; font-weight: 800; margin-bottom: 15px; border-left: 4px solid var(--accent-blue); padding-left: 10px;}
+
+        .highlight { color: var(--accent-blue); font-weight: 700; }
+        ul.custom-list { list-style: none; padding: 0; }
+        ul.custom-list li { margin-bottom: 12px; padding-left: 25px; position: relative; line-height: 1.5; }
+        ul.custom-list li::before { content: '→'; position: absolute; left: 0; color: var(--accent-blue); font-weight: bold; }
+
+        /* Barra de progreso */
+        .progress-container { margin: 20px 0; }
+        .progress { height: 25px; border-radius: 15px; background-color: #e2e8f0; overflow: hidden; }
+        .progress-bar { background-color: var(--accent-blue); font-weight: 700; font-size: 0.9rem; line-height: 25px; }
+
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color);}
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        .map-container { border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); height: 300px; }
+       
+        .alert-card { background: rgba(239, 68, 68, 0.05); border-left: 4px solid #EF4444; border-color: #EF4444; }
+        .alert-card h3 { border-left-color: #EF4444; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+       
+        @media (max-width: 768px) {
+            .container-main { margin: 20px 10px; padding: 20px; }
+            .hero-title { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('partials/navbar') %>
+
+    <div class="container-main">
+        <h1 class="hero-title">Plan de Acción Personalizado</h1>
+        <div class="hero-subtitle">Tu resultado: <span style="color: #7f1d1d; background: #fee2e2; padding: 2px 8px; border-radius: 6px;">Obesidad (IMC ≥ 30)</span></div>
+
+        <div class="info-card">
+            <h3>Bienvenido a tu Plan de Transformación</h3>
+            <p>Un resultado de "Obesidad" indica una acumulación excesiva de grasa corporal. Queremos recordarte que la obesidad es una condición médica multifactorial; no es tu culpa ni se trata solo de "fuerza de voluntad". El primer gran paso ya lo diste: informarte y tomar acción.</p>
+            <p><strong>El objetivo principal:</strong> Lograr una <span class="highlight">pérdida de grasa gradual y sostenible</span> (aproximadamente 0.5kg a 1kg por semana) para proteger tus articulaciones, mejorar tu salud cardiovascular, revertir posibles resistencias a la insulina y recuperar tu energía y movilidad.</p>
+           
+            <div class="progress-container mt-4">
+                <p style="margin-bottom: 5px; font-size: 0.9rem; font-weight: 700;">Fase de tu Transformación:</p>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 15%; background-color: #EF4444;" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100">Fase de Arranque</div>
+                </div>
+                <p style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">* Tu meta inicial debe ser perder entre el 5% y el 10% de tu peso corporal actual. ¡Eso ya genera mejoras masivas en tu salud!</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>¿Qué debo comer?</h3>
+                    <p>La clave absoluta para ti es el <span class="highlight">Déficit Calórico</span> (consumir menos calorías de las que tu cuerpo gasta) priorizando la saciedad para no pasar hambre:</p>
+                    <ul class="custom-list">
+                        <li><strong>Alto Volumen / Bajas Calorías:</strong> Llena la mitad de tu plato con verduras (espinaca, brócoli, calabacín). Te darán saciedad sin sumar calorías.</li>
+                        <li><strong>Proteínas Magras:</strong> Pechuga de pollo, pescado blanco, pavo, huevos o tofu. La proteína acelera el metabolismo y evita que pierdas músculo al adelgazar.</li>
+                        <li><strong>Controla las Grasas y Azúcares:</strong> Evita las frituras y los refrescos. Las grasas saludables (aguacate, aceite de oliva) son buenas, pero en cantidades pequeñas porque son densas en calorías.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Menú de Ejemplo Diario</h3>
+                    <ul class="custom-list">
+                        <li><span class="highlight">Desayuno:</span> Huevos revueltos (1 entero + 2 claras) con espinacas y champiñones, acompañado de una rebanada de pan integral y café sin azúcar.</li>
+                        <li><span class="highlight">Comida:</span> Pechuga de pollo asada (150g), una porción enorme de ensalada verde y media taza de lentejas o arroz integral.</li>
+                        <li><span class="highlight">Snack:</span> Gelatina sin azúcar o bastones de apio/zanahoria con hummus.</li>
+                        <li><span class="highlight">Cena:</span> Filete de pescado al horno con espárragos y calabacitas salteadas.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h3>Videos de Apoyo y Educación</h3>
+            <p>La información es tu mejor aliada. Entiende qué es realmente el déficit calórico y cómo puedes perder grasa sin sacrificar tu masa muscular.</p>
+           
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/HZ8rNNfgyU4" title="Déficit calórico explicado" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <p style="font-size: 0.85rem; font-weight: 600; text-align: center;">Cómo funciona la pérdida de grasa</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/eQMVJNktj_Q" title="Guía de Recomposición Corporal" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <p style="font-size: 0.85rem; font-weight: 600; text-align: center;">Pierde grasa mientras ganas músculo</p>
+                </div>
+            </div>
+
+            <div class="mt-3 p-3" style="background: rgba(14, 165, 233, 0.05); border-radius: 12px; border: 1px solid rgba(14, 165, 233, 0.2);">
+                <p style="margin-bottom: 0; font-size: 0.95rem;"><strong>Consejos clave de los videos:</strong> Un déficit calórico no significa dejar de comer ni morirse de hambre, sino hacer <span class="highlight">sustituciones inteligentes</span> (calidad vs volumen). Además, hacer entrenamiento de fuerza mientras estás en déficit obligará a tu cuerpo a utilizar la grasa almacenada como energía en lugar de quemar tu masa muscular.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Rutina de Ejercicio (Bajo Impacto)</h3>
+                    <p>Debido al peso extra, es crucial <span class="highlight">proteger tus articulaciones</span> (rodillas y tobillos). Evita correr o saltar por ahora.</p>
+                    <ul class="custom-list">
+                        <li><strong>Caminata Ligera:</strong> Empieza con 20 a 30 minutos diarios a buen ritmo. Escucha un podcast o música mientras lo haces.</li>
+                        <li><strong>Entrenamiento en Agua:</strong> La natación o los aeróbicos acuáticos son excepcionales porque el agua elimina el impacto en tus articulaciones.</li>
+                        <li><strong>Entrenamiento de Fuerza:</strong> Usar máquinas de gimnasio o pesas ligeras 2 o 3 veces por semana. Aumentar tu masa muscular acelerará tu metabolismo basal.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Gimnasios / Parques Cercanos</h3>
+                    <p style="margin-bottom: 10px; font-size: 0.9rem;">Encontrar un gimnasio con máquinas de bajo impacto (elíptica, bicicleta estática) o alberca será de gran ayuda para tus primeros meses.</p>
+                    <div class="map-container">
+                        <iframe width="100%" height="100%" frameborder="0" style="border:0" src="https://www.google.com/maps?q=gimnasios+cerca+de+mi&output=embed" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Consejos para el Éxito Diario</h3>
+                    <ul class="custom-list">
+                        <li><span class="highlight">Aumenta tu NEAT:</span> El NEAT es la energía que gastas en el día a día. Estaciónate más lejos, usa escaleras en lugar del elevador, y levántate cada hora.</li>
+                        <li><span class="highlight">Cuidado con las calorías líquidas:</span> Los jugos, refrescos, alcohol y el café con mucha azúcar añaden cientos de calorías sin llenarte. Pásate al agua, té o café solo.</li>
+                        <li><span class="highlight">Gestión emocional:</span> Muchas veces comemos por ansiedad o estrés, no por hambre real. Identifica tus detonantes.</li>
+                        <li><span class="highlight">Constancia sobre perfección:</span> Un tropiezo un día no arruina el proceso. Retoma tus hábitos en la siguiente comida.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-card alert-card">
+                    <h3>Advertencias Médicas Importantes</h3>
+                    <p style="margin-bottom: 10px; font-size: 0.9rem;"><strong>Aviso legal:</strong> La información aquí provista es general. La obesidad requiere un abordaje clínico formal y seguro.</p>
+                    <ul class="custom-list">
+                        <li><strong>Acude a un profesional médico:</strong> Es vital realizar estudios de sangre (perfil lipídico, glucosa, tiroides) con un médico general o endocrinólogo antes de comenzar.</li>
+                        <li><strong>Asesoría Nutricional:</strong> Acércate a un nutriólogo clínico. No hagas dietas extremas ("Keto" severa, dietas de líquidos) ya que provocan un efecto rebote peligroso.</li>
+                        <li><strong>Cero "Pastillas Milagrosas":</strong> Huye de tés detox, chupapanzas o quemadores de grasa. Solo estresan tu hígado y corazón sin solucionar el problema real.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

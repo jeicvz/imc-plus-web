@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos sobre Obesidad | IMC+</title>
+    <link rel="icon" type="image/png" href="/css/images/icon.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
+    <style>
+        :root {
+            --card-bg: #ffffff;
+            --container-bg: #ffffff;
+            --border-color: #0f172a;
+            --accent-blue: #0EA5E9; 
+            --text-dark: #0f172a;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            background: linear-gradient(135deg, #e0e7ff 0%, #F1F5F9 100%); 
+            color: var(--text-dark);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            min-height: 100vh;
+        }
+
+        /* EFECTOS DE FONDO SUTILES */
+        .pulse-bg { position: fixed; width: 600px; height: 600px; background: radial-gradient(circle, var(--accent-blue), transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); filter: blur(140px); opacity: 0.15; z-index: -2; animation: pulse 5s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 0.1; } 50% { opacity: 0.2; } 100% { opacity: 0.1; } }
+
+        .container-main { 
+            max-width: 1000px; 
+            margin: 60px auto; 
+            background: var(--container-bg); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 22px; 
+            padding: 40px; 
+            box-shadow: 0 15px 40px rgba(15, 23, 42, 0.12);
+            animation: fadeIn 0.8s ease;
+            position: relative;
+            z-index: 5;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        header { 
+            text-align: center;
+            margin-bottom: 30px; 
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+            padding-bottom: 20px;
+        }
+
+        .title-group h1 { font-size: 2.2rem; font-weight: 900; color: var(--text-dark); margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+
+        .tabs-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 35px; }
+
+        .tab-btn {
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .tab-btn:hover { 
+            background: var(--accent-blue); 
+            color: white; 
+            border-color: var(--accent-blue); 
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+        
+        .tab-btn.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(14, 165, 233, 0.3); }
+
+        .info-section { display: none; animation: fadeIn 0.5s ease; }
+        .info-section.active { display: block; }
+
+        .info-card {
+            background: var(--card-bg); 
+            border: 1px solid rgba(15, 23, 42, 0.08); 
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+            color: var(--text-dark);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .info-card:hover { transform: scale(1.01); box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05); }
+
+        .info-card h3 { color: var(--text-dark); font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; border-left: 4px solid var(--accent-blue); padding-left: 10px;}
+
+        .chart-container { position: relative; margin: auto; height: 280px; width: 100%; margin-bottom: 10px; }
+        .chart-container-large { position: relative; margin: auto; height: 350px; width: 100%; margin-bottom: 10px; }
+
+        /* MAGIA AQUÍ: Solo las listas de las tarjetas informativas tendrán las flechitas */
+        .info-card ul { list-style: none; padding: 0; }
+        .info-card li { margin-bottom: 12px; padding-left: 25px; position: relative; color: var(--text-dark); line-height: 1.5; opacity: 0.9; }
+        .info-card li::before { content: '→'; position: absolute; left: 0; color: var(--accent-blue); font-weight: bold; }
+
+        .footer-source { text-align: center; font-size: 0.75rem; color: #94a3b8; margin-top: 40px; font-weight: 700; }
+        .chart-note { font-size: 0.65rem; color: #94a3b8; margin-top: 5px; font-style: italic; }
+
+        /* =========================================
+           RESPONSIVIDAD SÚPER MEJORADA
+           ========================================= */
+        @media(max-width: 768px) {
+            .container-main { 
+                margin: 20px 15px; 
+                padding: 20px; 
+                width: auto;
+            }
+            .title-group h1 { font-size: 1.8rem; }
+            .tabs-container { gap: 8px; }
+            .tab-btn {
+                flex: 1 1 calc(50% - 10px);
+                padding: 8px 10px;
+                font-size: 0.75rem;
+                text-align: center;
+            }
+            .info-card { padding: 18px 15px; }
+            .info-card h3 { font-size: 1.1rem; }
+            .chart-container { height: 220px; }
+            .chart-container-large { height: 300px; }
+            .info-card li { font-size: 0.9rem; margin-bottom: 10px; }
+        }
+
+        @media(max-width: 480px) {
+            .title-group h1 { font-size: 1.5rem; }
+            .tab-btn {
+                flex: 1 1 100%; 
+            }
+            .chart-container { height: 200px; }
+            .chart-container-large { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('partials/navbar') %>
+
+    <div class="pulse-bg"></div>
+
+    <div class="container-main">
+        <header>
+            <div class="title-group">
+                <h1>Datos sobre la obesidad y sobrepeso</h1>
+            </div>
+        </header>
+
+        <main>
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="showTab(event, 'datos')">Estadísticas</button>
+                <button class="tab-btn" onclick="showTab(event, 'info')">Conceptos</button>
+                <button class="tab-btn" onclick="showTab(event, 'causas')">Causas</button>
+                <button class="tab-btn" onclick="showTab(event, 'riesgos')">Riesgos</button>
+                <button class="tab-btn" onclick="showTab(event, 'prevencion')">Soluciones</button>
+            </div>
+
+            <div id="datos" class="info-section active">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <h3>Crecimiento Histórico (x)</h3>
+                            <div class="chart-container">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                            <p style="font-size: 0.75rem; color: #0f172a; text-align: center; margin-bottom: 0;">Crecimiento proporcional desde 1990</p>
+                            <div class="chart-note text-center">* Dato estimado para el año actual</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <h3>Población Mundial (%)</h3>
+                            <div class="chart-container">
+                                <canvas id="pieChart"></canvas>
+                            </div>
+                            <p style="font-size: 0.75rem; color: #0f172a; text-align: center;">Distribución de salud nutricional adulta</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>Prevalencia por Regiones (OMS)</h3>
+                    <div class="chart-container-large">
+                        <canvas id="regionChart"></canvas>
+                    </div>
+                    <p style="font-size: 0.75rem; color: #0f172a; text-align: center; margin-top: 10px;">Porcentaje estimado de adultos con sobrepeso/obesidad por región.</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Situación Epidemiológica Actual</h3>
+                    <ul>
+                        <li><strong style="color: #0f172a;">Alcance Global:</strong> Más de 1000 millones de personas viven con obesidad actualmente.</li>
+                        <li><strong style="color: #0f172a;">Carga en Adultos:</strong> 2500 millones presentan sobrepeso (43% de la población mundial adulta).</li>
+                        <li><strong style="color: #0f172a;">Infancia y Juventud:</strong> 390 millones de niños y adolescentes afectados, una cifra que se ha multiplicado por 4 desde 1990.</li>
+                        <li><strong style="color: #0f172a;">Mortalidad:</strong> El sobrepeso y la obesidad están vinculados a más muertes en todo el mundo que la insuficiencia ponderal (bajo peso).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="info" class="info-section">
+                <div class="info-card">
+                    <h3>Naturaleza de la Enfermedad</h3>
+                    <p>La obesidad es una <strong style="color: #0f172a;">enfermedad crónica, compleja y multifactorial</strong> caracterizada por una acumulación excesiva de tejido adiposo que es perjudicial para la salud. Por su parte, el sobrepeso es una acumulación excesiva de grasa corporal que resulta en un peso superior al considerado saludable para una estatura determinada, sirviendo a menudo como antesala de la obesidad.</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-card" style="height: 100%;">
+                            <h3>Clasificación por IMC</h3>
+                            <p style="font-size: 0.9rem; margin-bottom: 15px;">El Índice de Masa Corporal es el indicador estándar primario:</p>
+                            <ul>
+                                <li><strong style="color: #0f172a;">Sobrepeso:</strong> IMC 25.0 - 29.9</li>
+                                <li><strong style="color: #0f172a;">Obesidad Grado I:</strong> IMC 30.0 - 34.9 (Bajo riesgo relativo)</li>
+                                <li><strong style="color: #0f172a;">Obesidad Grado II:</strong> IMC 35.0 - 39.9 (Riesgo moderado)</li>
+                                <li><strong style="color: #0f172a;">Obesidad Grado III:</strong> IMC ≥ 40.0 (Riesgo severo/Mórbida)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-card" style="height: 100%;">
+                            <h3>Limitaciones del IMC y Distribución</h3>
+                            <p style="font-size: 0.9rem; margin-bottom: 15px;">El IMC no mide directamente la grasa. Es vital observar dónde se acumula:</p>
+                            <ul>
+                                <li><strong style="color: #0EA5E9;">Distribución Androide (Forma de Manzana):</strong> Grasa acumulada en el abdomen. Está fuertemente asociada a un mayor riesgo cardiovascular y diabetes.</li>
+                                <li><strong style="color: #0EA5E9;">Distribución Ginoide (Forma de Pera):</strong> Grasa acumulada en caderas y muslos. Menor riesgo metabólico, pero mayor carga articular.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="causas" class="info-section">
+                <div class="info-card">
+                    <h3>Factores Ambientales y Conductuales</h3>
+                    <ul>
+                        <li><strong style="color: #0f172a;">Desequilibrio Energético:</strong> Ingesta prolongada de calorías superior al gasto energético diario del cuerpo.</li>
+                        <li><strong style="color: #0f172a;">Entorno Obesogénico:</strong> Diseño de ciudades y trabajos que limitan la actividad física, promoviendo el sedentarismo (pantallas, transporte motorizado).</li>
+                        <li><strong style="color: #0f172a;">Dietas Ultraprocesadas:</strong> Alta disponibilidad, bajo costo y marketing agresivo de productos hipercalóricos ricos en azúcares libres y grasas saturadas.</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Factores Biológicos, Psicológicos y Médicos</h3>
+                    <ul>
+                        <li><strong style="color: #0f172a;">Genética y Epigenética:</strong> Los genes pueden influir en la cantidad de grasa corporal que almacenas y en cómo tu cuerpo distribuye esa grasa o regula el apetito.</li>
+                        <li><strong style="color: #0f172a;">Factores Psicológicos:</strong> El estrés crónico, la ansiedad, la depresión y la falta de sueño aumentan la producción de cortisol, lo que estimula el apetito y el almacenamiento de grasa abdominal (hambre emocional).</li>
+                        <li><strong style="color: #0f172a;">Condiciones Médicas:</strong> Enfermedades como el hipotiroidismo, el síndrome de ovario poliquístico (SOP) y ciertos medicamentos (corticosteroides, antidepresivos) pueden facilitar el aumento de peso.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="riesgos" class="info-section">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-card" style="height: 100%;">
+                            <h3>Complicaciones Metabólicas</h3>
+                            <ul>
+                                <li><strong style="color: #0f172a;">Diabetes Tipo 2:</strong> La obesidad es el principal factor de riesgo, causando resistencia a la insulina.</li>
+                                <li><strong style="color: #0f172a;">Cardiovasculares:</strong> Alta probabilidad de hipertensión arterial, dislipidemia (colesterol alto) e infartos.</li>
+                                <li><strong style="color: #0f172a;">Cáncer:</strong> Fuerte vínculo comprobado con al menos 13 tipos de tumores (mama, colon, endometrio, riñón).</li>
+                                <li><strong style="color: #0f172a;">Hígado Graso:</strong> Enfermedad hepática no alcohólica que puede derivar en cirrosis.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-card" style="height: 100%;">
+                            <h3>Complicaciones Físicas y Mentales</h3>
+                            <ul>
+                                <li><strong style="color: #0f172a;">Apnea del Sueño:</strong> Trastorno grave donde la respiración se detiene repetidamente durante la noche debido a la presión en las vías respiratorias.</li>
+                                <li><strong style="color: #0f172a;">Problemas Osteoarticulares:</strong> Desgaste severo del cartílago (osteoartritis), especialmente en rodillas, caderas y columna.</li>
+                                <li><strong style="color: #0f172a;">Salud Mental:</strong> Alta incidencia de depresión, baja autoestima, aislamiento social y sufrimiento por el estigma y la discriminación social.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="prevencion" class="info-section">
+                <div class="info-card">
+                    <h3>Abordaje desde el Estilo de Vida</h3>
+                    <ul>
+                        <li><strong style="color: #0f172a;">Actividad Física Constante:</strong> Mínimo de 150-300 minutos de actividad aeróbica moderada a la semana para adultos, complementada con 2 días de entrenamiento de fuerza muscular.</li>
+                        <li><strong style="color: #0f172a;">Reeducación Nutricional:</strong> Transición hacia dietas basadas en alimentos enteros (frutas, verduras, legumbres, granos integrales y proteínas magras), limitando drásticamente azúcares añadidos.</li>
+                        <li><strong style="color: #0f172a;">Higiene del Sueño:</strong> Asegurar de 7 a 8 horas de sueño de calidad diario para regular las hormonas del apetito (grelina y leptina).</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>Intervenciones Médicas y Sociales</h3>
+                    <ul>
+                        <li><strong style="color: #0f172a;">Apoyo Psicológico:</strong> Terapia cognitivo-conductual para abordar la relación emocional con la comida y los trastornos por atracón.</li>
+                        <li><strong style="color: #0f172a;">Tratamientos Clínicos:</strong> En casos indicados, uso de fármacos aprobados para el control del peso o intervenciones quirúrgicas (cirugía bariátrica) bajo estricta supervisión médica.</li>
+                        <li><strong style="color: #0f172a;">Políticas Públicas:</strong> Implementación de etiquetado frontal claro en alimentos, impuestos a bebidas azucaradas y creación de entornos urbanos seguros para caminar o andar en bicicleta.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </main>
+
+        <p class="footer-source">FUENTE DE REFERENCIA: ORGANIZACIÓN MUNDIAL DE LA SALUD (OMS)</p>
+    </div>
+
+    <script>
+        Chart.register(ChartDataLabels);
+
+        /* Navegación de Pestañas */
+        function showTab(event, tabId) {
+            const sections = document.querySelectorAll('.info-section');
+            sections.forEach(sec => sec.classList.remove('active'));
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        /* GRÁFICA 1: TENDENCIA */
+        const ctxTrend = document.getElementById('trendChart').getContext('2d');
+        new Chart(ctxTrend, {
+            type: 'line',
+            data: {
+                labels: ['1990', '2000', '2010', '2020', '2026*'],
+                datasets: [{
+                    label: 'Multiplicador',
+                    data: [1, 1.5, 2.2, 3.1, 4.0],
+                    borderColor: '#0EA5E9',
+                    backgroundColor: 'rgba(14, 165, 233, 0.2)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointHoverRadius: 10,
+                    pointBackgroundColor: '#0EA5E9',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                animation: { duration: 2000, easing: 'easeInOutQuart' },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true, backgroundColor: '#0f172a', padding: 10, cornerRadius: 10 },
+                    datalabels: {
+                        color: '#0EA5E9',
+                        align: 'top',
+                        offset: 8,
+                        font: { weight: 'bold', size: 11 },
+                        formatter: (value) => value + 'x' 
+                    }
+                },
+                scales: {
+                    y: { 
+                        display: true,
+                        title: { display: true, text: 'Multiplicador', color: '#94a3b8', font: { size: 10, weight: 'bold' } },
+                        ticks: { display: true, color: '#94a3b8', font: { size: 9 } },
+                        grid: { color: 'rgba(15, 23, 42, 0.05)' },
+                        border: { display: true, color: 'rgba(15, 23, 42, 0.1)' }
+                    },
+                    x: { 
+                        display: true,
+                        ticks: { color: '#94a3b8' }, 
+                        grid: { display: false } 
+                    }
+                }
+            }
+        });
+
+        /* GRÁFICA 2: DISTRIBUCIÓN PASTEL */
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['Peso normal o bajo', 'Sobrepeso / Obesidad'],
+                datasets: [{
+                    data: [57, 43],
+                    backgroundColor: ['#cbd5e1', '#0EA5E9'],
+                    borderColor: 'transparent',
+                    borderWidth: 0,
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { 
+                        display: true, 
+                        position: 'bottom',
+                        labels: { boxWidth: 12, color: '#0f172a', font: { size: 11 }, padding: 20 }
+                    },
+                    datalabels: {
+                        color: (context) => context.dataIndex === 1 ? '#fff' : '#0f172a',
+                        font: { weight: 'bold', size: 14 },
+                        formatter: (value) => value + '%' 
+                    }
+                }
+            }
+        });
+
+        /* GRÁFICA 3: NUEVA GRÁFICA DE BARRAS (REGIONES) */
+        const ctxRegion = document.getElementById('regionChart').getContext('2d');
+        new Chart(ctxRegion, {
+            type: 'bar',
+            data: {
+                labels: ['América', 'Europa', 'Oriente Medio', 'Promedio Global', 'Asia Sur-Oriental', 'África'],
+                datasets: [{
+                    label: '% de Adultos con Sobrepeso u Obesidad',
+                    data: [63, 59, 49, 43, 28, 24], 
+                    backgroundColor: [
+                        '#0284C7', // America (Más alto)
+                        '#0EA5E9', // Europa
+                        '#38BDF8', // Oriente medio
+                        '#94A3B8', // Global (Gris para destacar que es el promedio)
+                        '#7DD3FC', // Asia
+                        '#BAE6FD'  // Africa
+                    ],
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 2500, easing: 'easeOutBounce' },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true, backgroundColor: '#0f172a', padding: 10, cornerRadius: 10 },
+                    datalabels: {
+                        color: (context) => context.dataIndex === 3 ? '#ffffff' : '#0f172a',
+                        anchor: 'end',
+                        align: 'bottom',
+                        offset: 10,
+                        font: { weight: 'bold', size: 12 },
+                        formatter: (value) => value + '%' 
+                    }
+                },
+                scales: {
+                    y: { 
+                        display: true,
+                        beginAtZero: true,
+                        max: 80,
+                        ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 20 },
+                        grid: { color: 'rgba(15, 23, 42, 0.05)' },
+                        border: { display: false }
+                    },
+                    x: { 
+                        display: true,
+                        ticks: { color: '#0f172a', font: { size: 11, weight: '600' } }, 
+                        grid: { display: false },
+                        border: { display: true, color: '#0f172a' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

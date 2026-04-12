@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMC+</title>
+    
+    <link rel="icon" type="image/png" href="/css/images/icon.png">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* RESET Y BASE - LIMPIO Y NATURAL */
+        html, body {
+            overflow-x: hidden; /* Solo evita scroll horizontal */
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; 
+            background-color: #F1F5F9; 
+            color: #1E293B; 
+            scroll-behavior: smooth; 
+        }
+        
+        /* Ajuste para que el scroll no quede pegado o tapado por el navbar */
+        #calculadora {
+            scroll-margin-top: 100px; 
+            position: relative;
+            z-index: 2;
+        }
+
+        #habitos {
+            scroll-margin-top: 130px; 
+            position: relative;
+            z-index: 2;
+        }
+
+        /* CAROUSEL PROFESIONAL */
+        #imcCarousel {
+            margin-top: 0 !important; /* Previene espacios no deseados en escritorio */
+        }
+        
+        .carousel-item img { 
+            height: calc(100vh - 100px); 
+            object-fit: cover; 
+            filter: brightness(0.5); 
+        }
+        .carousel-caption { 
+            bottom: auto; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            z-index: 10; 
+        }
+        .carousel-caption h3 { 
+            font-size: 3.8rem; 
+            font-weight: 900; 
+            text-shadow: 0 4px 15px rgba(0,0,0,0.4); 
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+        }
+        
+        @media (min-width: 769px) {
+            .text-end-custom {
+                text-align: right !important;
+                left: auto !important;
+                right: 10% !important;
+                width: 45%;
+            }
+        }
+
+        .carousel-btn-container { margin-top: 30px; display: flex; gap: 15px; justify-content: center; }
+        .text-end-custom .carousel-btn-container { justify-content: flex-end; } 
+        
+        .carousel-btn { 
+            padding: 14px 35px; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            text-decoration: none; 
+            transition: all 0.3s ease; 
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .btn-blue { background-color: #38BDF8; color: #0F172A; border: 2px solid #38BDF8; }
+        .btn-blue:hover { background-color: #0EA5E9; color: white; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4); }
+        .btn-outline { border: 2px solid white; color: white; }
+        .btn-outline:hover { background: white; color: #0F172A; }
+
+        /* SECCIÓN INFO GRID MODIFICADA */
+        .info-grid-section {
+            background-color: #0F172A;
+            padding: 80px 20px;
+        }
+        .info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .info-card:hover { transform: translateY(-10px); }
+        .info-img-circle {
+            width: 120px; 
+            height: 120px; 
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 4px solid #F1F5F9; 
+        }
+        .info-card h4 {
+            color: #0F172A; 
+            font-weight: 800;
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+        }
+        .info-card p {
+            color: #0F172A; 
+            font-weight: 700; 
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* BANNERS REFINADOS */
+        .hero-banner {
+            padding: 80px 20px;
+            text-align: center;
+        }
+        .hero-banner h1 { font-size: 3rem; font-weight: 800; margin-bottom: 25px; letter-spacing: -1px; }
+        .hero-content { width: 100%; margin: 0 auto; line-height: 1.8; font-size: 1.15rem; }
+
+        #calculadora-seccion {
+            background-color: #0F172A;
+            color: white;
+        }
+        #calculadora-seccion h1 { color: white; }
+        #calculadora-seccion .hero-content { color: #94A3B8; }
+
+        #habitos {
+            background-color: transparent; 
+            color: #0F172A; 
+            padding-bottom: 40px; 
+        }
+        #habitos h1 { color: #0F172A; } 
+        #habitos .hero-content { color: #0F172A; opacity: 0.9; } 
+
+
+        /* CONTENEDOR PADRE UNIFICADO */
+        .seccion-unificada-imc-habitos {
+            background: linear-gradient(135deg, #e0e7ff 0%, #F1F5F9 100%); 
+            padding-bottom: 40px; 
+        }
+
+        /* WRAPPER CALCULADORA */
+        .calc-wrapper {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: center;
+            align-items: stretch;
+            gap: 30px;
+            padding: 80px 20px;
+            background: transparent; 
+        }
+
+        /* CALCULADORA */
+        .container-calc { 
+            max-width: 480px; 
+            width: 100%;
+            background: white; 
+            padding: 45px 40px; 
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            text-align: center; 
+            border-top: 8px solid #38BDF8;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 5;
+        }
+        h2 { color: #0F172A; margin-bottom: 40px; font-weight: 900; letter-spacing: -0.5px; font-size: 2.2rem; }
+
+        .input-group { 
+            margin-bottom: 35px; 
+            text-align: left; 
+            display: block; 
+            background: #F8FAFC;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #E2E8F0;
+        }
+        .label-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        label { font-weight: 800; color: #1E293B; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.5px;}
+
+        input[type="range"] { width: 100%; height: 8px; border-radius: 10px; background: #CBD5E1; outline: none; -webkit-appearance: none; margin: 15px 0 5px 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; background: #38BDF8; cursor: pointer; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.1s;}
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+        .manual-input { 
+            width: 90px; 
+            padding: 8px 12px; 
+            text-align: center; 
+            background: white;
+            border: 2px solid #CBD5E1; 
+            border-radius: 12px; 
+            font-weight: 900; 
+            font-size: 1.1rem;
+            color: #0EA5E9;
+            transition: all 0.3s;
+        }
+        .manual-input:focus { border-color: #38BDF8; outline: none; box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15); }
+
+        .calc-btn { 
+            width: 100%; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            color: white; 
+            border: none; 
+            border-radius: 16px; 
+            cursor: pointer; 
+            font-size: 1.15rem; 
+            font-weight: 800; 
+            letter-spacing: 1px;
+            transition: all 0.3s ease; 
+            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.3);
+            margin-top: 10px;
+        }
+        .calc-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(15, 23, 42, 0.4); }
+
+        /* SECCIÓN HÁBITOS */
+        .seccion-habitos-fondo {
+            position: relative;
+            background-color: transparent; 
+            padding: 0 0 40px 0; 
+        }
+
+        /* RESULTADO LATERAL */
+        .resultado-lateral {
+            width: 380px;
+            background: white;
+            border-radius: 28px;
+            padding: 45px 30px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            border-top: 8px solid #F59E0B;
+            animation: slideIn 0.5s ease-out;
+            position: relative;
+            z-index: 5;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .resultado-lateral h1 { font-size: 85px; margin: 15px 0; font-weight: 900; letter-spacing: -3px; }
+        .resultado-lateral h2 { font-size: 1.8rem; margin-bottom: 20px; font-weight: 800; }
+
+        .btn-plan { 
+            display: block; 
+            margin-top: 35px; 
+            background-color: #10B981; 
+            color: white; 
+            text-decoration: none; 
+            padding: 18px; 
+            border-radius: 16px; 
+            font-weight: 800; 
+            transition: all 0.3s ease; 
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+        }
+        .btn-plan:hover { background-color: #059669; color: white; transform: translateY(-2px); box-shadow: 0 10px 15px rgba(16, 185, 129, 0.3); }
+
+        .text-bajo { color: #0EA5E9; }
+        .text-normal { color: #10B981; }
+        .text-sobre { color: #F59E0B; }
+        .text-obeso { color: #EF4444; }
+
+        /* DISCLAIMER INFO */
+        .disclaimer-imc {
+            width: 100%;
+            text-align: center;
+            margin-top: 25px;
+            padding: 0 20px;
+        }
+        .disclaimer-imc p {
+            color: #0F172A; 
+            margin-bottom: 15px;
+        }
+
+        /* AVISO FINAL (NUEVO BLOQUE INTEGRADO) */
+        .final-disclaimer {
+            background-color: #0F172A;
+            color: #94A3B8;
+            padding: 60px 20px;
+            text-align: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .final-disclaimer p {
+            max-width: 900px;
+            margin: 0 auto;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        /* --- MEDIA QUERIES --- */
+        @media (max-width: 992px) {
+            .info-card { padding: 25px 20px; }
+            .info-card h4 { font-size: 1.15rem; }
+            .resultado-lateral { width: 100%; max-width: 480px; }
+        }
+
+        @media (max-width: 768px) {
+            /* MATA EL ESPACIO BLANCO REBELDE EN CELULARES */
+            #imcCarousel {
+                margin-top: -2px !important; 
+            }
+
+            .carousel-item img { height: 55vh; }
+            .carousel-caption h3 { font-size: 2rem; }
+            
+            .hero-banner { padding: 50px 15px; }
+            .hero-banner h1 { font-size: 1.8rem; }
+            .hero-content { font-size: 0.95rem; line-height: 1.6; }
+            
+            .info-grid-section { padding: 50px 15px; }
+            .info-card { padding: 20px 15px; }
+            .info-img-circle { width: 80px; height: 80px; margin-bottom: 10px; border-width: 3px; }
+            .info-card h4 { font-size: 1.1rem; margin-bottom: 10px; }
+            .info-card p { font-size: 0.85rem; }
+
+            .calc-wrapper { padding: 30px 15px; gap: 20px; }
+            .container-calc { padding: 30px 20px; }
+            h2 { font-size: 1.8rem; margin-bottom: 25px; }
+            .input-group { padding: 15px; margin-bottom: 25px; }
+            
+            .resultado-lateral { width: 100%; padding: 30px 20px; }
+            .resultado-lateral h1 { font-size: 60px; }
+            .resultado-lateral h2 { font-size: 1.5rem; }
+
+            .seccion-habitos-fondo .col-md-6 { margin-bottom: 15px; }
+            .seccion-unificada-imc-habitos { padding-bottom: 0px; } /* Se elimina el padding extra para que el aviso quede pegado */
+            
+            .disclaimer-imc p:first-child { font-size: 0.95rem; }
+            .disclaimer-imc p:last-child { font-size: 0.75rem; }
+            
+            .final-disclaimer { padding: 40px 15px; }
+        }
+    </style>
+</head>
+<body onload="obtenerUbicacion()">
+
+    <%- include('partials/navbar') %>
+
+    <div id="imcCarousel" class="carousel slide shadow-sm" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#imcCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#imcCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <% if (!usuario) { %>
+                <button type="button" data-bs-target="#imcCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <% } %>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active" data-bs-interval="5000">
+                <img src="/css/images/slide1.jpg" class="d-block w-100" alt="Salud">
+                <div class="carousel-caption">
+                    <h3>Conoce tu estado de salud en segundos</h3>
+                    <p class="fs-5 opacity-75">Calcula tu IMC y empieza a mejorar tu bienestar hoy</p>
+                </div>
+            </div>
+            <div class="carousel-item" data-bs-interval="5000">
+                <img src="/css/images/slide2.jpg" class="d-block w-100" alt="Nutrición">
+                <div class="carousel-caption">
+                    <h3>Nutrición consciente</h3>
+                    <p class="fs-5 opacity-75">Descubre planes alimenticios basados en tu resultado de IMC</p>
+                </div>
+            </div>
+            <% if (!usuario) { %>
+            <div class="carousel-item" data-bs-interval="5000">
+                <img src="/css/images/slide3.jpg" class="d-block w-100" alt="Registro">
+                <div class="carousel-caption text-end-custom">
+                    <h3>Empieza tu cambio hoy</h3>
+                    <p class="fs-5 opacity-75">Regístrate y lleva el control de tu salud de forma inteligente</p>
+                    <div class="carousel-btn-container">
+                        <a href="/registro" class="carousel-btn btn-blue">Crear cuenta</a>
+                        <a href="/login" class="carousel-btn btn-outline">Entrar</a>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#imcCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#imcCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+    </div>
+
+    <section class="info-grid-section">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="info-card shadow-sm">
+                        <img src="/css/images/grid1.jpg" alt="Info 1" class="info-img-circle">
+                        <h4>¿Qué es IMC?</h4>
+                        <p>Sirve como indicador inicial para medir riesgos de salud relacionados con el peso, como diabetes o enfermedades cardiovasculares, el IMC no mide directamente la grasa corporal y no distingue entre músculo y grasa, por lo que puede no ser preciso para atletas o personas con mucha masa muscular.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card shadow-sm">
+                        <img src="/css/images/grid2.jpg" alt="Info 2" class="info-img-circle">
+                        <h4>¿Qué tan importante es?</h4>
+                        <p>Conocer tu IMC es muy importante ya que con ayuda de este puedes identificar de mejor manera los riesgos de enfermedades como diabetes, hipertensión y problemas cardíacos</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card shadow-sm">
+                        <img src="/css/images/grid3.jpg" alt="Info 3" class="info-img-circle">
+                        <h4>¿Cómo puedo consultarlo?</h4>
+                        <p>Con ayuda de <b>IMC+</b> puedes conocer tu estado actual de forma rápida a continuación te presentamos nuestra calculadora de IMC la cual dependiendo tu resultado de IMC te dara recomendaciones ya sea para aumentar, bajar o mantener tu peso.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="hero-banner" id="calculadora-seccion">
+        <h1>Calculadora de Índice de Masa Corporal (IMC)</h1>
+        <div class="hero-content">
+            <p>Conoce rápidamente tu estado físico con nuestra herramienta interactiva. Solo ingresa tu peso y estatura, y obtén al instante una referencia clara sobre tu condición corporal. Esta calculadora te ayudará a identificar si te encuentras en un rango saludable o si es recomendable tomar acciones para mejorar tu bienestar. Es una forma sencilla y práctica de monitorear tu salud día a día con ayuda de las siguientes clasificaciones de imc dadas por la oms:</p>
+            <div class="mt-4 d-flex justify-content-center flex-wrap gap-3" style="font-size: 0.9rem; opacity: 0.8;">
+                <span class="badge bg-light text-dark px-3 py-2">Bajo: < 18.5</span>
+                <span class="badge bg-success px-3 py-2">Normal: 18.5 - 24.9</span>
+                <span class="badge bg-warning text-dark px-3 py-2">Sobrepeso: 25 - 29.9</span>
+                <span class="badge bg-danger px-3 py-2">Obesidad: > 30</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="seccion-unificada-imc-habitos">
+        <div class="calc-wrapper">
+            <div class="container-calc" id="calculadora">
+                <h2>Calcula tu IMC</h2>
+                <form id="formIMC">
+                    <input type="hidden" name="latitud" id="latitud" value="">
+                    <input type="hidden" name="longitud" id="longitud" value="">
+                    
+                    <div class="input-group">
+                        <div class="label-container">
+                            <label>Peso Corporal (kg)</label>
+                            <input type="number" step="0.1" id="pesoManual" class="manual-input" value="70">
+                        </div>
+                        <input type="range" id="pesoSlider" min="10" max="200" step="0.5" value="70">
+                    </div>
+
+                    <div class="input-group">
+                        <div class="label-container">
+                            <label>Estatura (m)</label>
+                            <input type="number" step="0.01" id="alturaManual" class="manual-input" value="1.70">
+                        </div>
+                        <input type="range" id="alturaSlider" min="0.5" max="2.5" step="0.01" value="1.70">
+                    </div>
+
+                    <button type="submit" class="calc-btn">CALCULAR AHORA</button>
+                </form>
+            </div>
+
+            <div id="resultadoLateral" class="resultado-lateral">
+                <p style="color: #64748B; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;">Resultado Obtenido</p>
+                <h1 id="imcGrande">--</h1>
+                <h2 id="estadoIMC">--</h2>
+                <a id="resultadoLink" href="#" class="btn-plan">Ver Recomendaciones ➔</a>
+            </div>
+
+            <div class="disclaimer-imc">
+                <p style="font-weight: 800; font-size: 1.1rem;">El IMC no es relevante si eres menor de 18 años o estás en embarazo.</p>
+                <p style="font-size: 0.85rem; max-width: 900px; margin: 0 auto; opacity: 0.85;">*Esta información ha sido preparada para proporcionar conocimiento educativo útil, pero es solo para fines informativos y no debe considerarse un consejo médico. No deben reemplazar la consulta con tu médico. No hay garantía de que la información proporcionada sea actual, completa o precisa. IMC+ no asume ninguna responsabilidad por las decisiones tomadas en base a esta información. Asegúrate de discutir preguntas específicas sobre tu salud y tratamientos con un profesional de la salud. Para obtener más información consulta a un profesional de la salud.</p>
+            </div>
+        </div>
+
+        <div class="hero-banner" id="habitos">
+            <h1>Hábitos Recomendados para una Vida Saludable</h1>
+            <div class="hero-content">
+                <p>Mejorar tu salud no se trata solo de números, sino de los pequeños cambios que haces todos los días. A continuación, te presentamos 4 pilares clave que agrupan los mejores hábitos para mantener un estilo de vida más equilibrado. Incorporarlos poco a poco en tu rutina marcará una gran diferencia en tu bienestar físico y mental.</p>
+            </div>
+        </div>
+
+        <div class="seccion-habitos-fondo">
+            <div class="container">
+                <div class="row g-4 justify-content-center">
+                    
+                    <div class="col-md-6">
+                        <div class="info-card shadow-sm">
+                            <img src="/css/images/habito_nutricion.jpg" alt="Nutrición Integral" class="info-img-circle">
+                            <h4>01. Nutrición Integral</h4>
+                            <p>Prioriza una alimentación balanceada con vegetales y proteínas. Incluye un desayuno nutritivo, prefiere snacks inteligentes (frutas o semillas) y reduce tu consumo de sal y azúcares añadidos.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-card shadow-sm">
+                            <img src="/css/images/habito_movimiento.jpg" alt="Movimiento Activo" class="info-img-circle">
+                            <h4>02. Movimiento Activo</h4>
+                            <p>Realiza al menos 30 minutos de ejercicio moderado al día para proteger tu corazón. Complementa esto con una movilidad diaria activa: usa escaleras y camina más siempre que puedas.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-card shadow-sm">
+                            <img src="/css/images/habito_descanso.jpg" alt="Descanso y Mente" class="info-img-circle">
+                            <h4>03. Descanso y Salud Mental</h4>
+                            <p>Un sueño de 7 a 8 horas es vital para tu recuperación física. Acompáñalo con técnicas de gestión del estrés, como la meditación o la respiración consciente, para tu equilibrio emocional.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-card shadow-sm">
+                            <img src="/css/images/habito_cuidado.jpg" alt="Hidratación y Cuidado" class="info-img-circle">
+                            <h4>04. Hidratación y Cuidado</h4>
+                            <p>Bebe al menos 2 litros de agua diarios para una buena digestión y salud celular. Mantén un estilo de vida libre de tóxicos, evitando el tabaquismo y limitando el consumo de alcohol.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div> 
+
+    <div class="final-disclaimer">
+        <p><strong>Aviso Importante:</strong> La plataforma IMC+ y las herramientas que incluye, como la calculadora de Índice de Masa Corporal, están diseñadas estrictamente con fines informativos y educativos. Los resultados y recomendaciones proporcionados no constituyen un diagnóstico médico ni sustituyen la evaluación, consejo o tratamiento de un profesional de la salud certificado. Te sugerimos consultar siempre a tu médico antes de realizar cambios en tu dieta, estilo de vida o tomar decisiones relacionadas con tu salud y bienestar físico.</p>
+        <p style="margin-top: 20px; opacity: 0.6; font-size: 0.8rem;">© 2026 IMC+ Proyecto de Salud.</p>
+    </div>
+
+    <script>
+        function confirmarCerrarSesion(event) {
+            if(event) event.preventDefault();
+            
+            Swal.fire({
+                title: '¿Estas seguro de cerrar sesion?',
+                text: "sin sesion iniciada no podras ver tus calculos de imc ya hechos por lo cual no podras tener seguimiento sobre tu imc",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: '#F1F5F9',
+                confirmButtonText: 'SÍ, SALIR',
+                cancelButtonText: 'CANCELAR',
+                reverseButtons: true,
+                background: '#FFFFFF',
+                borderRadius: '24px',
+                customClass: {
+                    title: 'fw-bold text-dark',
+                    popup: 'shadow-lg',
+                    confirmButton: 'rounded-pill px-4 py-2',
+                    cancelButton: 'rounded-pill px-4 py-2 text-dark'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/logout";
+                }
+            });
+        }
+
+        const pesoSlider = document.getElementById('pesoSlider');
+        const pesoManual = document.getElementById('pesoManual');
+        const alturaSlider = document.getElementById('alturaSlider');
+        const alturaManual = document.getElementById('alturaManual');
+
+        pesoSlider.oninput = function() { pesoManual.value = this.value; }
+        pesoManual.oninput = function() { pesoSlider.value = this.value; }
+        alturaSlider.oninput = function() { alturaManual.value = this.value; }
+        alturaManual.oninput = function() { alturaSlider.value = this.value; }
+
+        document.getElementById('formIMC').onsubmit = async (e) => {
+            e.preventDefault();
+            const resLink = document.getElementById('resultadoLink');
+            const imcGrande = document.getElementById('imcGrande');
+            const estadoIMC = document.getElementById('estadoIMC');
+            const resLateral = document.getElementById('resultadoLateral');
+
+            const payload = {
+                peso: parseFloat(pesoManual.value),
+                altura: parseFloat(alturaManual.value),
+                latitud: document.getElementById('latitud').value || null,
+                longitud: document.getElementById('longitud').value || null
+            };
+
+            try {
+                const response = await fetch('/calcular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                
+                if(data.imc) {
+                    imcGrande.innerText = data.imc;
+                    estadoIMC.innerText = data.estado;
+                    
+                    estadoIMC.className = "";
+                    
+                    if(data.estado.includes("Bajo")) {
+                        estadoIMC.classList.add("text-bajo");
+                        resLink.href = "/planbajopeso";
+                    } else if(data.estado.includes("Normal")) {
+                        estadoIMC.classList.add("text-normal");
+                        resLink.href = "/planpesonormal";
+                    } else if(data.estado.includes("Sobrepeso")) {
+                        estadoIMC.classList.add("text-sobre");
+                        resLink.href = "/plansobrepeso";
+                    } else {
+                        estadoIMC.classList.add("text-obeso");
+                        resLink.href = "/planobesidad";
+                    }
+
+                    resLateral.style.display = 'block';
+
+                    // NUEVO: Scroll automático al resultado en celulares (Ajustado a 'center')
+                    if (window.innerWidth <= 992) {
+                        setTimeout(() => {
+                            resLateral.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
+                    }
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        };
+
+        function obtenerUbicacion() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    document.getElementById('latitud').value = pos.coords.latitude;
+                    document.getElementById('longitud').value = pos.coords.longitude;
+                });
+            }
+        }
+    </script>
+</body>
+</html>

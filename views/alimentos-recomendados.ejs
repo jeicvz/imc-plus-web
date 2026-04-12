@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alimentos Recomendados | IMC+</title>
+    <link rel="icon" type="image/png" href="/css/images/icon.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        /* --- VARIABLES DEL TEMA --- */
+        :root {
+            --card-bg: #ffffff;
+            --container-bg: #ffffff;
+            --border-color: rgba(15, 23, 42, 0.08);
+            --accent-blue: #0EA5E9; 
+            --text-dark: #0f172a;
+        }
+
+        /* --- ESTILO GENERAL --- */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #F1F5F9 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* EFECTOS DE FONDO SUTILES */
+        .pulse-bg { 
+            position: fixed; width: 600px; height: 600px; 
+            background: radial-gradient(circle, var(--accent-blue), transparent 70%); 
+            top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            filter: blur(140px); opacity: 0.15; z-index: -2; animation: pulse 5s infinite; 
+        }
+        @keyframes pulse { 0% { opacity: 0.1; } 50% { opacity: 0.2; } 100% { opacity: 0.1; } }
+
+        /* --- NAVBAR PRINCIPAL --- */
+        .navbar { 
+            background-color: #0f172a; padding: 0 60px; height: 70px; display: flex; 
+            justify-content: space-between; align-items: center; position: sticky; 
+            top: 0; z-index: 1001; box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .logo img { height: 45px; }
+
+        .nav-buttons {
+            display: flex; align-items: center; justify-content: flex-end; height: 100%; min-width: 200px;
+        }
+
+        .nav-profile-img {
+            width: 38px; height: 38px; border-radius: 50%; object-fit: cover;
+            border: none; margin-right: 12px; flex-shrink: 0;
+        }
+
+        .user-name { color: #F1F5F9; font-weight: 600; margin-right: 15px; font-size: 0.9rem; white-space: nowrap; }
+        
+        /* ESTILOS NOMBRES PC */
+        .user-real-name { display: inline-block; }
+        .user-username { display: none; }
+
+        /* --- BOTÓN CONFIGURACIÓN EN BLANCO --- */
+        .btn-config {
+            background: transparent; border: 1px solid #FFFFFF; color: #FFFFFF; font-size: 1.2rem;
+            padding: 5px 12px; border-radius: 8px; transition: 0.3s; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-config:hover { background: rgba(255, 255, 255, 0.1); color: #38BDF8; border-color: #38BDF8; }
+
+        /* --- MENÚ DESPLEGABLE DE USUARIO Y ALIMENTACIÓN UNIFICADO --- */
+        .dropdown-menu, .dropdown-content {
+            background-color: #1E293B; border: 1px solid rgba(255,255,255,0.1); padding: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-radius: 12px; min-width: 220px;
+        }
+        
+        .dropdown-item-custom, .dropdown-content a {
+            display: block; width: 100%; text-align: center; font-weight: 800; font-size: 0.85rem;
+            padding: 10px 15px; border-radius: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;
+            background-color: #0f172a; color: #F1F5F9; border: 1px solid rgba(56, 189, 248, 0.2); box-sizing: border-box;
+        }
+        .dropdown-item-custom:last-child, .dropdown-content a:last-child { margin-bottom: 0; }
+        .dropdown-item-custom:hover, .dropdown-content a:hover, .dropdown-content a.active-link { 
+            background-color: #38BDF8; color: #0F172A !important; border-color: #38BDF8;
+            transform: translateY(-2px); box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        /* --- BOTONES DE INICIAR SESIÓN Y REGISTRO --- */
+        .btn-nav-custom {
+            display: inline-block; text-align: center; font-weight: 800; font-size: 0.85rem;
+            padding: 9px 20px; border-radius: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px;
+            background-color: #0f172a; color: #F1F5F9 !important; border: 1px solid rgba(56, 189, 248, 0.2);
+            box-sizing: border-box; cursor: pointer;
+        }
+        .btn-nav-custom:hover {
+            background-color: #38BDF8; color: #0F172A !important; border-color: #38BDF8;
+            transform: translateY(-2px); box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        /* --- SUB-NAVBAR --- */
+        .sub-navbar { 
+            background-color: #0f172a; border-top: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 0 60px; height: 50px; position: sticky; top: 70px; z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .sub-nav-container { 
+            max-width: 1400px; height: 100%; margin: 0 auto; display: flex; gap: 40px; 
+            justify-content: flex-end; align-items: center;
+        }
+        .sub-link { 
+            color: #FFFFFF; text-decoration: none; font-size: 0.85rem; font-weight: 500; 
+            letter-spacing: 0.5px; text-transform: uppercase; transition: 0.3s; position: relative;
+            opacity: 0.8; display: inline-block; white-space: nowrap;
+        }
+        .sub-link::after {
+            content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0;
+            background-color: #38BDF8; transition: 0.3s;
+        }
+        .sub-link:hover, .active-link { color: #38BDF8 !important; text-decoration: none; opacity: 1 !important; }
+        .sub-link:hover::after, .active-link::after { width: 100% !important; }
+
+        .nav-item-dropdown { position: relative; display: inline-flex; align-items: center; height: 100%; }
+        .nav-item-dropdown::before { content: ""; position: absolute; top: 100%; left: 0; width: 100%; height: 15px; display: none; }
+        .nav-item-dropdown:hover::before { display: block; }
+        .dropdown-content { display: none; position: absolute; right: 0; top: 100%; z-index: 1002; }
+        .nav-item-dropdown:hover .dropdown-content { display: block; }
+
+        /* --- CONTENEDOR PRINCIPAL ESTILO FAQ --- */
+        .container-main {
+            max-width: 1000px; margin: 60px auto; padding: 40px;
+            background: var(--container-bg); border: 1px solid var(--border-color); 
+            border-radius: 22px; box-shadow: 0 15px 40px rgba(15, 23, 42, 0.12);
+            animation: fadeIn 0.8s ease; position: relative; z-index: 5;
+        }
+
+        .hero-title { 
+            font-size: 2.2rem; font-weight: 900; text-align: center; color: var(--text-dark); 
+            text-transform: uppercase; margin-bottom: 30px; letter-spacing: 1px; 
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08); padding-bottom: 20px;
+        }
+
+        /* --- ACORDEÓN PREMIUM ANIMADO --- */
+        .accordion-item {
+            background: var(--card-bg); border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 16px !important; margin-bottom: 15px; overflow: hidden;
+            transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .accordion-item:hover { transform: translateX(8px); border-left: 6px solid var(--accent-blue); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+
+        .accordion-button { 
+            background-color: #ffffff !important; color: var(--text-dark) !important; font-weight: 800; 
+            padding: 20px 25px; font-size: 1.1rem; letter-spacing: 0.5px; box-shadow: none !important; 
+        }
+        .accordion-button:not(.collapsed) { 
+            background-color: rgba(15, 23, 42, 0.03) !important; color: var(--accent-blue) !important; 
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        }
+        .accordion-button::after { filter: brightness(0); }
+        .accordion-body { line-height: 1.6; color: var(--text-dark) !important; background-color: #ffffff; padding: 20px 25px; }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { 
+            padding: 8px 18px; border-radius: 8px; border: 1px solid var(--border-color); 
+            background: #ffffff; color: var(--text-dark); cursor: pointer; transition: 0.3s; font-weight: 600;
+        }
+        .tab-btn.active { background: var(--accent-blue); color: #ffffff; border-color: var(--accent-blue); }
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        .card-info { 
+            background: rgba(15, 23, 42, 0.03); padding: 25px; border-radius: 12px; 
+            line-height: 1.7; border-left: 4px solid var(--accent-blue); color: var(--text-dark); 
+        }
+        .highlight { color: var(--accent-blue); font-weight: 700; }
+        .img-table { width: 100%; max-width: 600px; height: auto; display: block; margin: 15px auto; border-radius: 8px; border: 1px solid rgba(15, 23, 42, 0.1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* =========================================
+           RESPONSIVIDAD PERFECTA PARA MÓVILES
+           ========================================= */
+        @media (max-width: 768px) {
+            .navbar { padding: 10px 15px; height: 70px; flex-wrap: nowrap; justify-content: space-between; }
+            .logo img { height: 32px; }
+            .nav-buttons { gap: 8px; min-width: auto; }
+            
+            /* ESTILOS NOMBRES MÓVIL */
+            .user-real-name { display: none !important; } 
+            .user-username { display: inline-block !important; font-size: 0.85rem; margin-right: 8px; }
+
+            .nav-profile-img { margin-right: 0; width: 32px; height: 32px; }
+            .btn-nav-custom { padding: 6px 12px; font-size: 0.75rem; margin-right: 0 !important; }
+
+            /* AJUSTES SCROLL MÓVIL */
+            .sub-navbar { padding: 0; height: auto; overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+            .sub-nav-container { justify-content: flex-start; gap: 20px; padding: 12px 15px; width: max-content; }
+            .nav-item-dropdown { position: static; }
+            .dropdown-content { left: 0; right: 0; width: 100%; top: 100%; border-radius: 0 0 12px 12px; }
+
+            .container-main { margin: 20px 15px; padding: 20px 15px; }
+            .hero-title { font-size: 1.5rem; margin-bottom: 20px; padding-bottom: 15px; }
+            .accordion-item:hover { transform: none; } 
+            .accordion-button { padding: 12px 15px; font-size: 1rem; }
+            .accordion-body { padding: 15px; }
+            .tabs { flex-wrap: wrap; justify-content: flex-start; gap: 6px; }
+            .tab-btn { padding: 6px 10px; font-size: 0.8rem; flex-grow: 1; text-align: center; }
+            .card-info { padding: 15px; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="pulse-bg"></div>
+
+    <nav class="navbar">
+        <div class="logo">
+            <a href="/"><img src="/css/images/logo.png" alt="IMC Plus Logo"></a>
+        </div>
+        <div class="nav-buttons">
+            <% if (usuario) { %>
+                <img src="<%= (foto && foto !== '') ? foto : '/css/images/nopic.jpg' %>" class="nav-profile-img" alt="Avatar">
+                <span class="user-name user-real-name"><%= (typeof nombre !== 'undefined' && nombre) ? nombre : usuario %></span>
+                <span class="user-name user-username"><%= usuario %></span>
+                <div class="dropdown">
+                    <button class="btn-config" type="button" data-bs-toggle="dropdown" aria-expanded="false">☰</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item-custom" href="/editar-perfil">Editar Perfil</a></li>
+                        <li><a class="dropdown-item-custom" href="javascript:void(0)" onclick="confirmarCerrarSesionNav()">Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            <% } else { %>
+                <a href="/login" class="btn-nav-custom" style="margin-right: 10px;">Iniciar Sesión</a>
+                <a href="/registro" class="btn-nav-custom">Registrarse</a>
+            <% } %>
+        </div>
+    </nav>
+
+    <div class="sub-navbar" id="scrollableSubNav">
+        <div class="sub-nav-container">
+            <a href="/" class="sub-link">INICIO</a>
+            <a href="/#calculadora" class="sub-link">CALCULADORA IMC</a>
+            <a href="/#habitos" class="sub-link">HÁBITOS RECOMENDADOS</a>
+            <% if (usuario) { %>
+                <a href="/historial" class="sub-link">Historial de mis cálculos</a>
+            <% } %>
+            <a href="/datos-obesidad" class="sub-link">Datos Obesidad</a>
+            <a href="/faq" class="sub-link">Preguntas Frecuentes</a>
+            
+            <div class="nav-item-dropdown">
+                <a href="#" class="sub-link" id="link-alimentacion">ALIMENTACIÓN</a>
+                <div class="dropdown-content">
+                    <a href="/piramide-salud">Pirámide de salud</a>
+                    <a href="/alimentos-recomendados">R. Generales</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-main">
+        <h2 class="hero-title">Recomendaciones generales de alimentación</h2>
+
+        <div class="accordion" id="accordionFood">
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#frutas">
+                        🍎 FRUTAS
+                    </button>
+                </h2>
+                <div id="frutas" class="accordion-collapse collapse" data-bs-parent="#accordionFood">
+                    <div class="accordion-body">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="openTab(event,'f1')">Definición</button>
+                            <button class="tab-btn" onclick="openTab(event,'f2')">Nutrición</button>
+                            <button class="tab-btn" onclick="openTab(event,'f3')">Composición</button>
+                            <button class="tab-btn" onclick="openTab(event,'f4')">Consejos</button>
+                            <button class="tab-btn" onclick="openTab(event,'f5')">Ingesta</button>
+                        </div>
+                        <div id="f1" class="tab-content active">
+                            <div class="card-info">
+                                <p>Según el <span class="highlight">Código Alimentario Español (CAE)</span>, se denomina fruta al fruto carnoso o de pulpa dulce que haya alcanzado el grado de madurez adecuado para el consumo humano. Son esenciales por su aporte de vitalidad y frescura.</p>
+                            </div>
+                        </div>
+                        <div id="f2" class="tab-content">
+                            <div class="card-info">
+                                <ul>
+                                    <li><span class="highlight">Micronutrientes:</span> Altamente ricas en vitaminas A, C, B1, B2, B6 y ácido fólico. Además, aportan minerales vitales como el potasio y el magnesio.</li>
+                                    <li><span class="highlight">Hidratación natural:</span> Su composición es fundamentalmente agua, abarcando entre un 80% y 95% de su peso total, ideales para la rehidratación.</li>
+                                    <li><span class="highlight">Antioxidantes:</span> Contienen flavonoides y polifenoles que combaten el envejecimiento celular.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="f3" class="tab-content">
+                            <div class="card-info">
+                                <img src="/css/images/tablafrutas.jpg" alt="Tabla Composición Frutas" class="img-table">
+                            </div>
+                        </div>
+                        <div id="f4" class="tab-content">
+                            <div class="card-info">
+                                <p>Consúmela <span class="highlight">entera y con piel</span> (previamente bien lavada) para aprovechar al máximo la pectina y fibra, lo que ayuda a la digestión y da saciedad. Es preferible evitar los jugos envasados o triturados, ya que se pierde fibra y se absorben los azúcares demasiado rápido.</p>
+                            </div>
+                        </div>
+                        <div id="f5" class="tab-content">
+                            <div class="card-info">
+                                <p class="highlight">Se recomiendan más de 3 raciones al día.</p>
+                                <p>Una ración equivale a una pieza de fruta mediana (una manzana, plátano, naranja o pera), o en el caso de frutas pequeñas, una taza de fresas, uvas o cerezas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#verduras">
+                         🥦 VERDURAS Y HORTALIZAS
+                    </button>
+                </h2>
+                <div id="verduras" class="accordion-collapse collapse" data-bs-parent="#accordionFood">
+                    <div class="accordion-body">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="openTab(event,'v1')">Definición</button>
+                            <button class="tab-btn" onclick="openTab(event,'v2')">Nutrición</button>
+                            <button class="tab-btn" onclick="openTab(event,'v3')">Consejos</button>
+                            <button class="tab-btn" onclick="openTab(event,'v4')">Ingesta</button>
+                        </div>
+                        <div id="v1" class="tab-content active">
+                            <div class="card-info">
+                                <p><span class="highlight">Hortalizas:</span> Agrupa a cualquier planta herbácea cultivada en huertas que puede consumirse como alimento, ya sea en forma de hojas, raíces, flores o tallos. Son la base estructural de toda dieta equilibrada.</p>
+                            </div>
+                        </div>
+                        <div id="v2" class="tab-content">
+                            <div class="card-info">
+                                <p>Destacan por ser fuentes excepcionales de vitaminas (K, C, Provitamina A) y hierro vegetal. Son ricas en <span class="highlight">fibra soluble e insoluble</span> que regulan el tránsito intestinal, y al igual que las frutas, son bajas en calorías, altas en agua y no contienen absolutamente nada de colesterol.</p>
+                            </div>
+                        </div>
+                        <div id="v3" class="tab-content">
+                            <div class="card-info">
+                                <p>Cocinar al vapor es el mejor método para retener sus vitaminas termosensibles. También se sugiere aprovechar el <span class="highlight">líquido de cocción</span> sobrante para preparar sopas o caldos, ya que muchas vitaminas y minerales quedan en el agua.</p>
+                            </div>
+                        </div>
+                        <div id="v4" class="tab-content">
+                            <div class="card-info">
+                                <p class="highlight">Se recomienda un mínimo de 2 a 3 raciones al día.</p>
+                                <p>El consejo de oro es asegurar que al menos una de estas raciones diarias se consuma en <span class="highlight">formato crudo</span> (como en una ensalada fresca).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#cereales">
+                         🌾 CEREALES
+                    </button>
+                </h2>
+                <div id="cereales" class="accordion-collapse collapse" data-bs-parent="#accordionFood">
+                    <div class="accordion-body">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="openTab(event,'c1')">Definición</button>
+                            <button class="tab-btn" onclick="openTab(event,'c2')">Nutrición</button>
+                            <button class="tab-btn" onclick="openTab(event,'c3')">Composición</button>
+                            <button class="tab-btn" onclick="openTab(event,'c4')">Consejos</button>
+                            <button class="tab-btn" onclick="openTab(event,'c5')">Ingesta</button>
+                        </div>
+                        <div id="c1" class="tab-content active">
+                            <div class="card-info">
+                                <p>El <span class="highlight">CAE</span> denomina cereal a “las plantas gramíneas y a sus frutos maduros, enteros, sanos y secos”. Incluye alimentos universales como el trigo, el maíz, el arroz, la avena y el centeno.</p>
+                            </div>
+                        </div>
+                        <div id="c2" class="tab-content">
+                            <div class="card-info">
+                                <ul>
+                                    <li><span class="highlight">Carbohidratos:</span> Aportan un 65-75%. Son tu principal fuente de energía de liberación lenta.</li>
+                                    <li><span class="highlight">Proteína:</span> Contienen proteínas vegetales como el gluten (excepto el arroz, avena pura y maíz, que son libres de gluten natural).</li>
+                                    <li><span class="highlight">Minerales:</span> Excelente fuente de hierro, potasio, fósforo y calcio, fundamentales para la salud ósea y muscular.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="c3" class="tab-content">
+                            <div class="card-info">
+                                <img src="/css/images/tablacereales.jpg" alt="Tabla Composición Cereales" class="img-table">
+                            </div>
+                        </div>
+                        <div id="c4" class="tab-content">
+                            <div class="card-info">
+                                <p>Prioriza siempre consumir sus versiones <span class="highlight">integrales o de grano entero</span>, ya que mantienen el germen y el salvado, multiplicando su aporte de fibra y mejorando la digestión. Hay que limitar las harinas refinadas y la bollería industrial procesada.</p>
+                            </div>
+                        </div>
+                        <div id="c5" class="tab-content">
+                            <div class="card-info">
+                                <p class="highlight">De 4 a 6 raciones al día.</p>
+                                <p>Es importante ajustar esta ingesta a la actividad física: a mayor desgaste físico, mayor requerimiento de cereales de calidad.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#grasas">
+                         🥑 GRASAS Y ACEITES
+                    </button>
+                </h2>
+                <div id="grasas" class="accordion-collapse collapse" data-bs-parent="#accordionFood">
+                    <div class="accordion-body">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="openTab(event,'g1')">Definición</button>
+                            <button class="tab-btn" onclick="openTab(event,'g2')">Nutrición</button>
+                            <button class="tab-btn" onclick="openTab(event,'g3')">Consejos</button>
+                            <button class="tab-btn" onclick="openTab(event,'g4')">Ingesta</button>
+                        </div>
+                        <div id="g1" class="tab-content active">
+                            <div class="card-info">
+                                <p>Son productos de origen animal o vegetal constituidos por glicéridos naturales de ácidos grasos. A pesar de su mala fama histórica, son nutrientes esenciales para proteger órganos y absorber vitaminas liposolubles (A, D, E y K).</p>
+                            </div>
+                        </div>
+                        <div id="g2" class="tab-content">
+                            <div class="card-info">
+                                <ul>
+                                    <li><span class="highlight">Energía pura:</span> Son el macronutriente más denso, aportando 9 kcal/g.</li>
+                                    <li><span class="highlight">Calidad vegetal:</span> El Aceite de Oliva Extra Virgen (AOVE) destaca por su ácido oleico (monoinsaturado), que actúa como un poderoso cardioprotector elevando el "colesterol bueno" (HDL).</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="g3" class="tab-content">
+                            <div class="card-info">
+                                <p>Siempre que sea posible, usa la grasa en crudo (como aliño de ensaladas). Si cocinas a fuego, usa preferentemente <span class="highlight">aceite de oliva</span> virgen, dado que su punto de humo es alto y ofrece mayor resistencia a la oxidación térmica en comparación con otros aceites.</p>
+                            </div>
+                        </div>
+                        <div id="g4" class="tab-content">
+                            <div class="card-info">
+                                <p class="highlight">Las grasas deben suponer un 30-35% de las calorías totales del día.</p>
+                                <p>Esto equivale de manera general a unos 30-60 gramos al día de grasa saludable total, controlando las grasas saturadas de origen animal.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#legumbres">
+                         🥜 LEGUMBRES
+                    </button>
+                </h2>
+                <div id="legumbres" class="accordion-collapse collapse" data-bs-parent="#accordionFood">
+                    <div class="accordion-body">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="openTab(event,'leg1')">Definición</button>
+                            <button class="tab-btn" onclick="openTab(event,'leg2')">Nutrición</button>
+                            <button class="tab-btn" onclick="openTab(event,'leg3')">Consejos</button>
+                            <button class="tab-btn" onclick="openTab(event,'leg4')">Ingesta</button>
+                        </div>
+                        <div id="leg1" class="tab-content active">
+                            <div class="card-info">
+                                <p>El <span class="highlight">Código Alimentario Español (CAE)</span> define a las legumbres como “las semillas secas, limpias, sanas y separadas de la vaina, procedentes de plantas de la familia de las leguminosas”. Engloba maravillas como garbanzos, frijoles, lentejas y soja.</p>
+                            </div>
+                        </div>
+                        <div id="leg2" class="tab-content">
+                            <div class="card-info">
+                                <p>Son la principal fuente de <span class="highlight">proteína vegetal (17-25%)</span>. Al combinarse con cereales (como un plato de lentejas con arroz), completan todos los aminoácidos esenciales creando una proteína de calidad similar a la carne.</p>
+                                <ul>
+                                    <li><span class="highlight">Fibra:</span> Tienen un alto índice, que aplana las curvas de glucosa e insulina, manteniéndote saciado por más tiempo.</li>
+                                    <li><span class="highlight">Minerales:</span> Altas en calcio, fósforo y magnesio.</li>
+                                    <li><span class="highlight">Vitaminas:</span> Poderosa fuente de vitaminas del Grupo B (especialmente tiamina).</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="leg3" class="tab-content">
+                            <div class="card-info">
+                                <p>Es importante <span class="highlight">remojarlas desde la noche anterior</span> (unas 12 horas, excepto las lentejas más finas) para eliminar antinutrientes que causan pesadez. Al cocinarlas, usa 3 partes de agua por 1 de legumbre. Para que tu cuerpo absorba mejor su hierro (hierro no hemo), acompáñalas en tu comida con una fuente de <span class="highlight">Vitamina C</span> (kiwi, naranja o un trozo de pimiento crudo).</p>
+                            </div>
+                        </div>
+                        <div id="leg4" class="tab-content">
+                            <div class="card-info">
+                                <p class="highlight">Lo ideal son de 3 a 4 raciones generosas a la semana.</p>
+                                <p>Una ración equivale a unos <span class="highlight">70-80g en peso crudo</span>, que al hidratarse forman un plato individual completo y muy saciante.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#huevos">
+                        🥚 HUEVOS
+                    </button>
+                </h2>
+                <div id="huevos" class="accordion-collapse collapse" data-bs-parent="#accordionFood">
+                    <div class="accordion-body">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="openTab(event,'h1')">Definición</button>
+                            <button class="tab-btn" onclick="openTab(event,'h2')">Nutrición</button>
+                            <button class="tab-btn" onclick="openTab(event,'h3')">Composición</button>
+                            <button class="tab-btn" onclick="openTab(event,'h4')">Consejos</button>
+                            <button class="tab-btn" onclick="openTab(event,'h5')">Ingesta</button>
+                        </div>
+                        <div id="h1" class="tab-content active">
+                            <div class="card-info">
+                                <p>Según el <span class="highlight">Código Alimentario Español (CAE)</span>, sólo se consideran "huevos" (sin nombrar la especie) los que proceden de gallinas. Son óvulos no fecundados, y uno de los alimentos más redondos y completos que nos ofrece la naturaleza.</p>
+                            </div>
+                        </div>
+                        <div id="h2" class="tab-content">
+                            <div class="card-info">
+                                <p>Tienen la <span class="highlight">proteína de mayor calidad</span> existente (valor biológico de 100), ya que contiene absolutamente todos los aminoácidos esenciales que el cuerpo necesita en proporciones perfectas. También aporta hierro biodisponible, vitamina B12 y colina (fundamental para la salud cerebral y memoria).</p>
+                            </div>
+                        </div>
+                        <div id="h3" class="tab-content">
+                            <div class="card-info">
+                                <p>La <span class="highlight">clara</span> está compuesta fundamentalmente por agua y albúmina (proteína pura libre de grasas). La <span class="highlight">yema</span> concentra todo el sabor, la grasa saludable (lecitina), el hierro, y vitaminas A, B, D y E.</p>
+                                <p><em>Dato curioso:</em> El color de la cáscara (blanco o rubio) depende solo de la raza de la gallina, la composición nutritiva interna es idéntica.</p>
+                            </div>
+                        </div>
+                        <div id="h4" class="tab-content">
+                            <div class="card-info">
+                                <p><span class="highlight">Culinario:</span> Cocinar el huevo (hervido, a la plancha, revuelto) no solo mata bacterias, sino que mejora dramáticamente la digestión y asimilación de su proteína en nuestro cuerpo comparado con consumirlo crudo.</p>
+                                <p><span class="highlight">Seguridad (Salmonelosis):</span> Conserva en la nevera. <span class="highlight">NUNCA laves los huevos</span> antes de guardarlos, ya que destruyes su cutícula protectora y las bacterias pueden penetrar la cáscara porosa. Casca el huevo en un recipiente distinto al que vas a usar para batirlo.</p>
+                            </div>
+                        </div>
+                        <div id="h5" class="tab-content">
+                            <div class="card-info">
+                                <p class="highlight">Es seguro consumir de 3 a 5 huevos a la semana, ¡incluso uno al día!</p>
+                                <p>Múltiples estudios recientes demuestran que el colesterol dietético del huevo apenas impacta el colesterol en sangre en personas sanas. Si existe hipercolesterolemia diagnosticada, el médico puede sugerir limitar la yema a 2-3 veces semanales, pero la clara es de consumo libre.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#carne">
+                         🥩 CARNE
+                    </button>
+                </h2>
+                <div id="carne" class="accordion-collapse collapse" data-bs-parent="#accordionFood">
+                    <div class="accordion-body">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="openTab(event,'car1')">Definición</button>
+                            <button class="tab-btn" onclick="openTab(event,'car2')">Nutrición</button>
+                            <button class="tab-btn" onclick="openTab(event,'car3')">Composición</button>
+                            <button class="tab-btn" onclick="openTab(event,'car4')">Consejos</button>
+                            <button class="tab-btn" onclick="openTab(event,'car5')">Ingesta</button>
+                        </div>
+                        <div id="car1" class="tab-content active">
+                            <div class="card-info">
+                                <p>Según el <span class="highlight">Código Alimentario Español (CAE)</span>, se denomina carne a “las partes blandas comestibles del ganado bovino, ovino, porcino y de las aves”. Ha sido un pilar evolutivo en la dieta humana por su gran densidad de nutrientes.</p>
+                            </div>
+                        </div>
+                        <div id="car2" class="tab-content">
+                            <div class="card-info">
+                                <p>Destacan por aportar entre un <span class="highlight">16-22% de proteínas</span> de alto valor biológico (completas en aminoácidos esenciales), claves para la masa muscular y regeneración celular.</p>
+                                <ul>
+                                    <li><span class="highlight">Vitaminas:</span> Es fuente primaria del Complejo B, destacando enormemente en Vitamina B12, nutriente que no se encuentra en el reino vegetal de forma activa.</li>
+                                    <li><span class="highlight">Minerales:</span> Rica en <span class="highlight">hierro tipo hemo</span> (que el cuerpo absorbe muy fácilmente a diferencia del vegetal) y zinc de altísima calidad.</li>
+                                    <li><span class="highlight">Grasas:</span> Dependen del animal y del corte. La carne de ave es magra, mientras que la del cerdo o vaca varía según la zona anatómica.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="car3" class="tab-content">
+                            <div class="card-info">
+                                <img src="/css/images/tablacarne.jpg" alt="Tabla Composición Carne" class="img-table">
+                            </div>
+                        </div>
+                        <div id="car4" class="tab-content">
+                            <div class="card-info">
+                                <ul>
+                                    <li>Seleccionar preferentemente <span class="highlight">cortes magros</span> (lomo, solomillo, pechuga) y retirar la grasa visible perimetral y la piel de las aves antes de cocinarlas.</li>
+                                    <li>Utilizar cocciones saludables: hervir, horno, plancha o vapor. Evitar carbonizar o quemar las zonas exteriores en parrillas, ya que genera componentes poco saludables (aminas heterocíclicas).</li>
+                                    <li>Moderar fuertemente el consumo de vísceras (altas en colesterol y purinas) y carnes procesadas o embutidos.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="car5" class="tab-content">
+                            <div class="card-info">
+                                <p class="highlight">Se aconsejan de 3 a 4 raciones a la semana, alternando siempre entre carnes blancas y limitando las rojas.</p>
+                                <p>Una ración en adultos sanos equivale a unos <span class="highlight">100-125g</span> (aproximadamente un filete del tamaño de la palma de la mano o un cuarto de pollo).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pescado">
+                         🐟 PESCADO
+                    </button>
+                </h2>
+                <div id="pescado" class="accordion-collapse collapse" data-bs-parent="#accordionFood">
+                    <div class="accordion-body">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="openTab(event,'p1')">Definición</button>
+                            <button class="tab-btn" onclick="openTab(event,'p2')">Nutrición</button>
+                            <button class="tab-btn" onclick="openTab(event,'p3')">Consejos</button>
+                            <button class="tab-btn" onclick="openTab(event,'p4')">Ingesta</button>
+                        </div>
+                        <div id="p1" class="tab-content active">
+                            <div class="card-info">
+                                <p>El <span class="highlight">CAE</span> lo define como “todo animal vertebrado comestible, marino o de agua dulce, fresco o conservado”. Se divide principalmente en pescados blancos (magros, como la merluza o el bacalao) y pescados azules (grasos, como el salmón o la sardina).</p>
+                            </div>
+                        </div>
+                        <div id="p2" class="tab-content">
+                            <div class="card-info">
+                                <p>Aportan un espectacular <span class="highlight">18-20% de proteínas</span> de altísimo valor biológico, pero a diferencia de la carne, su digestión es muchísimo más ligera por tener muy escaso tejido conjuntivo.</p>
+                                <ul>
+                                    <li><span class="highlight">Grasas de Oro:</span> El pescado azul es el rey absoluto del <span class="highlight">Omega 3 (DHA y EPA)</span>, un ácido graso antiinflamatorio vital para la salud cardiovascular y el cerebro.</li>
+                                    <li><span class="highlight">Micronutrientes:</span> Destacan las vitaminas del Grupo B, el Yodo, Fósforo, y vitaminas liposolubles A y D (especialmente en especies grasas).</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="p3" class="tab-content">
+                            <div class="card-info">
+                                <p><span class="highlight">Garantía de frescura:</span> Al comprarlo fíjate en ojos brillantes (no hundidos), agallas rojo vivo y una carne de textura muy firme que recupere la forma al presionarla.</p>
+                                <p><span class="highlight">Seguridad (Anisakis):</span> Es un parásito habitual. Para eliminar el riesgo por completo, cocina el centro del producto a 60°C por al menos 10 min. Si lo vas a consumir crudo o semi-crudo (sushi, boquerones en vinagre, ceviche) es LEY congelarlo a -20°C por al menos 5 días.</p>
+                            </div>
+                        </div>
+                        <div id="p4" class="tab-content">
+                            <div class="card-info">
+                                <p class="highlight">La meta dorada: 3 a 4 raciones a la semana, buscando que al menos 2 sean de pescado azul.</p>
+                                <p>Una ración ronda los <span class="highlight">125-150g</span> en crudo (un buen lomo de salmón o un filete individual).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#frutos-secos">
+                         🌰 FRUTOS SECOS
+                    </button>
+                </h2>
+                <div id="frutos-secos" class="accordion-collapse collapse" data-bs-parent="#accordionFood">
+                    <div class="accordion-body">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="openTab(event,'fs1')">Definición</button>
+                            <button class="tab-btn" onclick="openTab(event,'fs2')">Nutrición</button>
+                            <button class="tab-btn" onclick="openTab(event,'fs3')">Consejos</button>
+                            <button class="tab-btn" onclick="openTab(event,'fs4')">Ingesta</button>
+                        </div>
+                        <div id="fs1" class="tab-content active">
+                            <div class="card-info">
+                                <p>El <span class="highlight">CAE</span> los define como semillas encerradas en cáscaras duras cuya parte comestible posee menos del 50% de agua en su estado natural (nueces, almendras, avellanas, pistachos). Son auténticas "píldoras" de energía natural.</p>
+                            </div>
+                        </div>
+                        <div id="fs2" class="tab-content">
+                            <div class="card-info">
+                                <ul>
+                                    <li><span class="highlight">Grasas:</span> Su mayor composición. Pero son grasas espectaculares para el corazón (ácidos mono y poliinsaturados, bajando el colesterol malo).</li>
+                                    <li><span class="highlight">Proteínas:</span> Muy ricas, rondan entre el 10% y el 30%, siendo estupendos aliados en dietas vegetales o deportivas.</li>
+                                    <li><span class="highlight">Protectores:</span> Llenos de potasio, calcio, magnesio y potentes dosis de vitamina E antioxidante.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="fs3" class="tab-content">
+                            <div class="card-info">
+                                <p>La regla de oro es comprarlos y consumirlos <span class="highlight">al natural (crudos) o tostados sin sal</span>. Debes huir de las versiones fritas, bañadas en miel o cubiertas de chocolate. Son perfectos como snack saciante de media mañana o para darle textura "crunchy" a ensaladas o yogures.</p>
+                            </div>
+                        </div>
+                        <div id="fs4" class="tab-content">
+                            <div class="card-info">
+                                <p class="highlight">Consumo diario moderado: 3 a 7 raciones a la semana.</p>
+                                <p>A pesar de ser sanos, son muy calóricos. La porción ideal es un "puñado" con la mano cerrada, que equivale a unos <span class="highlight">20-30g</span> cada vez.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#especias">
+                         🌶️ ESPECIAS Y CONDIMENTOS
+                    </button>
+                </h2>
+                <div id="especias" class="accordion-collapse collapse" data-bs-parent="#accordionFood">
+                    <div class="accordion-body">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="openTab(event,'es1')">Función</button>
+                            <button class="tab-btn" onclick="openTab(event,'es2')">Propiedades</button>
+                            <button class="tab-btn" onclick="openTab(event,'es3')">Hierbas</button>
+                            <button class="tab-btn" onclick="openTab(event,'es4')">Picantes</button>
+                        </div>
+                        <div id="es1" class="tab-content active">
+                            <div class="card-info">
+                                <p>Tienen la increíble capacidad de potenciar y transformar el sabor de la comida plana, lo que se traduce en un superpoder: <span class="highlight">permiten reducir drásticamente el consumo de sal</span> de mesa, cuidando tus riñones y controlando la tensión arterial de forma natural.</p>
+                            </div>
+                        </div>
+                        <div id="es2" class="tab-content">
+                            <div class="card-info">
+                                <p>Más allá del sabor, son medicina pura en pequeñas dosis. Son altamente densas en flavonoides, por lo que tienen formidables propiedades antioxidantes, antibacterianas y digestivas (ayudando a segregar jugos gástricos y combatiendo los gases molestos).</p>
+                            </div>
+                        </div>
+                        <div id="es3" class="tab-content">
+                            <div class="card-info">
+                                <p><span class="highlight">Hierbas Aromáticas:</span> Esenciales en el estilo mediterráneo (orégano, albahaca, perejil, romero, tomillo). Para que no pierdan su frescor, color y aroma volátil, se recomienda añadirlas hacia el final de la cocción o como "topping" en crudo.</p>
+                            </div>
+                        </div>
+                        <div id="es4" class="tab-content">
+                            <div class="card-info">
+                                <p><span class="highlight">Condimentos Picantes:</span> Chiles, pimienta negra, cayena, pimentón picante. Contienen compuestos biológicos (como la capsaicina y piperina) que no solo dan sabor, sino que son potentes vasodilatadores que ayudan a la circulación y provocan un leve "efecto termogénico" en el metabolismo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function confirmarCerrarSesionNav() {
+            Swal.fire({
+                title: '¿Estás seguro que quieres salir de tu cuenta de IMC+?',
+                text: "Al hacer esto no se guardarán tus cálculos. Cualquier medición que realices sin iniciar sesión no quedará registrada en tu historial para darle seguimiento.",
+                icon: 'warning',
+                iconColor: '#ffffff',
+                showCancelButton: true,
+                background: '#0f172a',
+                color: '#fff',
+                confirmButtonColor: '#2563EB',
+                cancelButtonColor: '#e74c3c',
+                confirmButtonText: 'Sí, salir',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/logout';
+                }
+            });
+        }
+
+        function actualizarEnlacesActivos() {
+            const currentPath = window.location.pathname;
+            const currentHash = window.location.hash;
+            const links = document.querySelectorAll('.sub-link, .dropdown-content a');
+
+            links.forEach(link => {
+                link.classList.remove('active-link');
+                const linkHref = link.getAttribute('href');
+
+                if (currentHash && linkHref.includes(currentHash)) {
+                    link.classList.add('active-link');
+                } else if (currentPath !== "/" && linkHref === currentPath) {
+                    link.classList.add('active-link');
+                    if (link.closest('.dropdown-content')) {
+                        document.getElementById('link-alimentacion').classList.add('active-link');
+                    }
+                } else if (currentPath === "/" && currentHash === "" && linkHref === "/") {
+                    link.classList.add('active-link');
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            actualizarEnlacesActivos();
+
+            // --- MAGIA DEL SCROLL ---
+            const subNav = document.getElementById('scrollableSubNav');
+            if (subNav) {
+                const savedScrollPos = sessionStorage.getItem('subNavScrollPosition');
+                if (savedScrollPos) {
+                    subNav.scrollLeft = parseInt(savedScrollPos, 10);
+                }
+
+                subNav.addEventListener('scroll', () => {
+                    sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
+                });
+            }
+        });
+
+        window.addEventListener("hashchange", actualizarEnlacesActivos);
+
+        document.querySelectorAll('a[href^="/#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const subNav = document.getElementById('scrollableSubNav');
+                if (subNav) sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
+
+                if (window.location.pathname === "/") {
+                    setTimeout(actualizarEnlacesActivos, 10);
+                }
+            });
+        });
+
+        // FUNCIÓN TABS
+        function openTab(evt, tabId) {
+            let container = evt.target.closest(".accordion-body");
+            container.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+            container.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+            container.querySelector("#" + tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>

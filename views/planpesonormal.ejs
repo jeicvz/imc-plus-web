@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Peso Normal | IMC+</title>
+    <link rel="icon" type="image/png" href="/css/images/icon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES DEL TEMA --- */
+        :root {
+            /* Fondo actualizado al desvanecido del proyecto */
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #F1F5F9 100%); 
+            --text-main: #1e293b; 
+            --card-bg: #ffffff;
+            --container-bg: #ffffff;
+            --border-color: #0f172a;
+            --accent-blue: #10B981; /* Verde para denotar normalidad/salud */
+            --text-dark: #0f172a;
+        }
+
+        /* --- ESTILO GENERAL --- */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .container-main {
+            max-width: 1000px; 
+            margin: 60px auto; 
+            padding: 40px;
+            background: var(--container-bg); 
+            border: 1px solid rgba(15, 23, 42, 0.1); 
+            border-radius: 22px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            animation: fadeIn 0.8s ease;
+            position: relative;
+            z-index: 5;
+        }
+
+        .hero-title { 
+            font-size: 2.2rem; 
+            font-weight: 900; 
+            text-align: center; 
+            color: var(--text-dark); 
+            text-transform: uppercase; 
+            margin-bottom: 10px; 
+            letter-spacing: 1px; 
+        }
+
+        .hero-subtitle {
+            text-align: center;
+            color: var(--accent-blue);
+            font-weight: 700;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .info-card {
+            background: var(--card-bg); 
+            border: 1px solid rgba(15, 23, 42, 0.1); 
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+            color: var(--text-dark);
+            height: 100%;
+        }
+        .info-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .info-card h3 { color: var(--text-dark); font-size: 1.2rem; font-weight: 800; margin-bottom: 15px; border-left: 4px solid var(--accent-blue); padding-left: 10px;}
+
+        .highlight { color: var(--accent-blue); font-weight: 700; }
+        ul.custom-list { list-style: none; padding: 0; }
+        ul.custom-list li { margin-bottom: 12px; padding-left: 25px; position: relative; line-height: 1.5; }
+        ul.custom-list li::before { content: '→'; position: absolute; left: 0; color: var(--accent-blue); font-weight: bold; }
+
+        /* Barra de progreso */
+        .progress-container { margin: 20px 0; }
+        .progress { height: 25px; border-radius: 15px; background-color: #e2e8f0; overflow: hidden; }
+        .progress-bar { background-color: var(--accent-blue); font-weight: 700; font-size: 0.9rem; line-height: 25px; }
+
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(15, 23, 42, 0.1);}
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        .map-container { border-radius: 12px; overflow: hidden; border: 1px solid rgba(15, 23, 42, 0.1); height: 300px; }
+        
+        /* Fallback de Ubicación */
+        .location-denied-box {
+            height: 300px;
+            background: #fef2f2;
+            border-radius: 12px;
+            border: 2px dashed #ef4444;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .alert-card { background: rgba(239, 68, 68, 0.05); border-left: 4px solid #EF4444; border-color: #EF4444; }
+        .alert-card h3 { border-left-color: #EF4444; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 768px) {
+            .container-main { margin: 20px 10px; padding: 20px; }
+            .hero-title { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('partials/navbar') %>
+
+    <div class="container-main">
+        <h1 class="hero-title">Plan de Acción Personalizado</h1>
+        <div class="hero-subtitle">Tu resultado: <span style="color: #064e3b; background: #d1fae5; padding: 2px 8px; border-radius: 6px;">Peso Normal (IMC 18.5 - 24.9)</span></div>
+
+        <div class="info-card">
+            <h3>¡Felicidades! Estás en tu peso ideal</h3>
+            <p>Tener un IMC en la categoría de "Peso Normal" significa que la proporción entre tu peso y tu estatura se encuentra dentro de los rangos saludables establecidos por la Organización Mundial de la Salud (OMS).</p>
+            <p><strong>El objetivo principal:</strong> El objetivo ahora no es la báscula, sino el <span class="highlight">mantenimiento y la recomposición corporal</span>. Puedes tener un peso normal, pero si tu porcentaje de grasa es alto, tu salud puede mejorar. Enfócate en mantener hábitos saludables, ganar resistencia y tonificar.</p>
+            
+            <div class="progress-container mt-4">
+                <p style="margin-bottom: 5px; font-size: 0.9rem; font-weight: 700;">Estado de tu Meta Saludable:</p>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Fase de Mantenimiento Óptimo</div>
+                </div>
+                <p style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">* Mantén tus calorías de mantenimiento y enfócate en la calidad de tus nutrientes.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>¿Qué debo comer?</h3>
+                    <p>Necesitas una dieta normocalórica (comer lo mismo que gastas). Un plato ideal se divide así:</p>
+                    <ul class="custom-list">
+                        <li><strong>50% Verduras y Frutas:</strong> Aportan vitaminas, minerales y fibra. Te mantienen saciado sin sumar muchas calorías.</li>
+                        <li><strong>25% Proteínas de calidad:</strong> Huevo, pescado, legumbres, pollo o pavo. Mantienen la masa muscular que tienes.</li>
+                        <li><strong>25% Carbohidratos complejos:</strong> Arroz integral, quinoa, papa, camote o pasta integral para energía sostenida.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Menú de Ejemplo Diario</h3>
+                    <ul class="custom-list">
+                        <li><span class="highlight">Desayuno:</span> Tostadas de pan integral con aguacate y huevo cocido + 1 fruta entera (ej. manzana o naranja).</li>
+                        <li><span class="highlight">Comida:</span> Plato dividido: mitad ensalada fresca, un cuarto de salmón o pechuga a la plancha y un cuarto de arroz o quinoa.</li>
+                        <li><span class="highlight">Snack:</span> Un yogur natural sin azúcar con un puñadito de almendras o nueces.</li>
+                        <li><span class="highlight">Cena:</span> Ensalada con atún, tomate, pepino y un chorrito de aceite de oliva extra virgen.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h3>Videos de Apoyo y Nutrición</h3>
+            <p>Descubre cómo mantener tu peso estable y, si lo deseas, cómo transformar ese peso ganando músculo sin acumular grasa extra.</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-12 mb-4">
+                    <h5 style="font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 15px;">Para Mantenerte Sano y Equilibrado:</h5>
+                    <div class="video-container" style="max-width: 800px; margin: 0 auto;">
+                        <iframe src="https://www.youtube.com/embed/GVtrIegFi9A" title="Cómo mantener tu peso ideal" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <hr style="border-color: rgba(15, 23, 42, 0.1); margin: 20px 0;">
+                
+                <h5 style="font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 20px;">Por si buscas ganar masa muscular o tonificar (Volumen Limpio):</h5>
+                
+                <div class="col-md-6">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/_Q4zAMHJzKY" title="Qué comer para ganar músculo" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/0i1Njzz3a64" title="Cómo ganar músculo sin acumular grasa" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Rutina de Ejercicio (Mantenimiento)</h3>
+                    <p>La clave de la salud a largo plazo está en combinar <span class="highlight">ejercicio cardiovascular y entrenamiento de fuerza</span>. Dedica 4-5 días a la semana:</p>
+                    <ul class="custom-list">
+                        <li><strong>Cardio (2-3 días):</strong> Correr ligero, nadar, andar en bicicleta o caminar a buen ritmo por 30-45 minutos.</li>
+                        <li><strong>Fuerza (2 días):</strong> Levantamiento de pesas o calistenia (peso corporal) para mantener tus músculos activos y fuertes.</li>
+                        <li><strong>Flexibilidad (Diario):</strong> Estiramientos o yoga suave por 10 minutos al despertar o antes de dormir.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Gimnasios Cercanos a Ti</h3>
+                    <p style="margin-bottom: 10px; font-size: 0.9rem;">Entrenar en un entorno preparado con máquinas, pesas libres o clases guiadas te ayudará a mantener la constancia en el tiempo.</p>
+                    
+                    <div id="map-wrapper">
+                        <div class="map-container">
+                            <iframe id="gym-map" width="100%" height="100%" frameborder="0" style="border:0" src="about:blank" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Consejos Generales para el Día a Día</h3>
+                    <ul class="custom-list">
+                        <li><span class="highlight">No te obsesiones con la báscula:</span> Es normal que el peso fluctúe de 1 a 2 kilos por día debido a la hidratación o la digestión. Fíjate más en cómo te queda la ropa.</li>
+                        <li><span class="highlight">Maneja el estrés:</span> El cortisol alto promueve la acumulación de grasa abdominal incluso en personas con peso normal.</li>
+                        <li><span class="highlight">Mantén el equilibrio:</span> Disfruta de un postre o una salida social el fin de semana. La clave es que el 80% de tus comidas sean nutritivas.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-card alert-card">
+                    <h3>Advertencias Importantes</h3>
+                    <p style="margin-bottom: 10px; font-size: 0.9rem;"><strong>Aviso legal:</strong> Este plan es de carácter estrictamente informativo y no sustituye un tratamiento médico ni nutricional personalizado.</p>
+                    <ul class="custom-list">
+                        <li><strong>Consulta a un especialista:</strong> Incluso estando en tu "peso ideal", es vital hacerse chequeos generales anuales con un médico para revisar tu glucosa, colesterol y triglicéridos.</li>
+                        <li><strong>No te suplementes sin control:</strong> Evita comprar quemadores de grasa, detox o pastillas mágicas en internet. No los necesitas y pueden poner en riesgo tus riñones o hígado si no son recetados por un experto.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- LÓGICA DE GEOLOCALIZACIÓN ---
+        function initLocationCheck() {
+            const mapWrapper = document.getElementById('map-wrapper');
+            const iframe = document.getElementById('gym-map');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        // SI ACEPTA: Cargamos el mapa con sus coordenadas (buscando gimnasios)
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        iframe.src = `https://maps.google.com/maps?q=gimnasios&ll=${lat},${lon}&z=14&output=embed`;
+                    },
+                    () => {
+                        // SI RECHAZA: Bloqueamos el contenido
+                        showDeniedMessage();
+                    }
+                );
+            } else {
+                showDeniedMessage();
+            }
+        }
+
+        function showDeniedMessage() {
+            const mapWrapper = document.getElementById('map-wrapper');
+            mapWrapper.innerHTML = `
+                <div class="location-denied-box">
+                    <span style="font-size: 3rem;">📍</span>
+                    <h5 class="mt-3" style="color: #991b1b; font-weight: 800;">Ubicación Bloqueada</h5>
+                    <p style="color: #7f1d1d; font-size: 0.85rem; font-weight: 500;">
+                        No podemos mostrarte gimnasios cercanos sin acceso a tu ubicación. 
+                        Por favor, actívala en tu navegador para ver este contenido.
+                    </p>
+                </div>
+            `;
+        }
+
+        initLocationCheck(); // Llamar a la función del mapa
+    </script>
+</body>
+</html>

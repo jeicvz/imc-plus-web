@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Sobrepeso | IMC+</title>
+    <link rel="icon" type="image/png" href="/css/images/icon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES DEL TEMA --- */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #F1F5F9 100%); 
+            --text-main: #1e293b; 
+            --card-bg: #ffffff;
+            --container-bg: #ffffff;
+            --border-color: rgba(15, 23, 42, 0.1);
+            --accent-blue: #0EA5E9; 
+            --text-dark: #0f172a;
+        }
+
+        /* --- ESTILO GENERAL --- */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .container-main {
+            max-width: 1000px; 
+            margin: 60px auto; 
+            padding: 40px;
+            background: var(--container-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 22px; 
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
+            animation: fadeIn 0.8s ease;
+            position: relative;
+            z-index: 5;
+        }
+
+        .hero-title { 
+            font-size: 2.2rem; 
+            font-weight: 900; 
+            text-align: center; 
+            color: var(--text-dark); 
+            text-transform: uppercase; 
+            margin-bottom: 10px; 
+            letter-spacing: 1px; 
+        }
+
+        .hero-subtitle {
+            text-align: center;
+            color: var(--accent-blue);
+            font-weight: 700;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .info-card {
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+            color: var(--text-dark);
+            height: 100%;
+        }
+        .info-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .info-card h3 { color: var(--text-dark); font-size: 1.2rem; font-weight: 800; margin-bottom: 15px; border-left: 4px solid var(--accent-blue); padding-left: 10px;}
+
+        .highlight { color: var(--accent-blue); font-weight: 700; }
+        ul.custom-list { list-style: none; padding: 0; }
+        ul.custom-list li { margin-bottom: 12px; padding-left: 25px; position: relative; line-height: 1.5; }
+        ul.custom-list li::before { content: '→'; position: absolute; left: 0; color: var(--accent-blue); font-weight: bold; }
+
+        /* Barra de progreso */
+        .progress-container { margin: 20px 0; }
+        .progress { height: 25px; border-radius: 15px; background-color: #e2e8f0; overflow: hidden; }
+        .progress-bar { background-color: #F59E0B; font-weight: 700; font-size: 0.9rem; line-height: 25px; }
+
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color);}
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        .map-container { border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); height: 300px; }
+        
+        .alert-card { background: rgba(245, 158, 11, 0.05); border-left: 4px solid #F59E0B; border-color: #F59E0B; }
+        .alert-card h3 { border-left-color: #F59E0B; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 768px) {
+            .container-main { margin: 20px 10px; padding: 20px; }
+            .hero-title { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('partials/navbar') %>
+
+    <div class="container-main">
+        <h1 class="hero-title">Plan de Acción Personalizado</h1>
+        <div class="hero-subtitle">Tu resultado: <span style="color: #92400e; background: #fef3c7; padding: 2px 8px; border-radius: 6px;">Sobrepeso (IMC 25 - 29.9)</span></div>
+
+        <div class="info-card">
+            <h3>El Momento Ideal para Actuar</h3>
+            <p>Estar en la categoría de "Sobrepeso" es una señal de alerta temprana de tu cuerpo. Significa que tienes reservas de energía (grasa) acumuladas que tu cuerpo no está utilizando. ¡La buena noticia es que estás a un paso de volver a tu peso ideal con ajustes simples y sostenibles!</p>
+            <p><strong>El objetivo principal:</strong> Generar un <span class="highlight">déficit calórico moderado</span> para perder grasa progresivamente mientras implementas el hábito del ejercicio. No necesitas dietas restrictivas extremas, solo mejorar tus elecciones diarias.</p>
+            
+            <div class="progress-container mt-4">
+                <p style="margin-bottom: 5px; font-size: 0.9rem; font-weight: 700;">Progreso hacia el Peso Normal:</p>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">Fase de Corrección de Hábitos</div>
+                </div>
+                <p style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">* Con constancia, podrías llegar a la categoría de "Peso Normal" en unos pocos meses perdiendo de 2 a 4 kilos por mes de forma saludable.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>¿Qué debo comer?</h3>
+                    <p>Necesitas reducir ligeramente las porciones e intercambiar alimentos densos en calorías por alimentos densos en nutrientes:</p>
+                    <ul class="custom-list">
+                        <li><strong>Aumenta la Fibra:</strong> Incluye vegetales en todas tus comidas principales. La fibra te mantendrá lleno por horas y mejorará tu digestión.</li>
+                        <li><strong>Proteína en cada comida:</strong> Prioriza pechuga, pescado, claras de huevo o yogur griego. La proteína quema más calorías al digerirse (efecto térmico).</li>
+                        <li><strong>Carbohidratos Estratégicos:</strong> No los elimines, solo cómelos inteligentemente. Prefiere avena, papa, o arroz integral en lugar de pan dulce o pastas refinadas.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Menú de Ejemplo Diario</h3>
+                    <ul class="custom-list">
+                        <li><span class="highlight">Desayuno:</span> Bowl de yogur griego natural (sin azúcar) con media taza de avena, frutos rojos y un toque de canela.</li>
+                        <li><span class="highlight">Comida:</span> 120-150g de carne magra o pollo a la plancha, media taza de arroz o una papa cocida, y abundante brócoli o ensalada verde.</li>
+                        <li><span class="highlight">Snack:</span> Una manzana cortada con crema de cacahuate o un puñado pequeño de almendras.</li>
+                        <li><span class="highlight">Cena:</span> Huevos revueltos con tomate y cebolla o un wrap de atún en tortilla de harina integral.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h3>Videos de Apoyo y Educación</h3>
+            <p>Entender la ciencia detrás de la pérdida de grasa te evitará caer en mitos y dietas de moda que solo causan efecto rebote.</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/HZ8rNNfgyU4" title="Déficit calórico explicado" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <p style="font-size: 0.85rem; font-weight: 600; text-align: center;">El secreto real para perder peso</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/eQMVJNktj_Q" title="Guía de Recomposición Corporal" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <p style="font-size: 0.85rem; font-weight: 600; text-align: center;">Transforma tu cuerpo inteligentemente</p>
+                </div>
+            </div>
+
+            <div class="mt-3 p-3" style="background: rgba(14, 165, 233, 0.05); border-radius: 12px; border: 1px solid rgba(14, 165, 233, 0.2);">
+                <p style="margin-bottom: 0; font-size: 0.95rem;"><strong>Consejos clave de los videos:</strong> Perder peso no es sinónimo de dejar de comer cosas ricas, sino de cuidar tus totales calóricos. Aplicar el principio de "recomposición corporal" te permitirá oxidar esa grasa extra mientras fortaleces tus músculos, dándole a tu cuerpo un aspecto más firme y tonificado.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Rutina de Ejercicio (Activa tu Metabolismo)</h3>
+                    <p>El sobrepeso te permite hacer una mayor variedad de ejercicios que la obesidad. Combina pesas y cardio para mejores resultados:</p>
+                    <ul class="custom-list">
+                        <li><strong>Entrenamiento de Fuerza (3 días):</strong> Usa pesas, bandas elásticas o tu propio cuerpo (sentadillas, desplantes, lagartijas).</li>
+                        <li><strong>Cardio (2-3 días):</strong> 30 a 40 minutos de trote suave, bicicleta o baile.</li>
+                        <li><strong>Movimiento Diario:</strong> Ponte la meta de llegar a los <span class="highlight">8,000 - 10,000 pasos</span> diarios.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Gimnasios Cercanos a Ti</h3>
+                    <p style="margin-bottom: 10px; font-size: 0.9rem;">Tener un lugar dedicado a tu entrenamiento te ayudará a desconectarte de la rutina y enfocarte 100% en tu salud.</p>
+                    <div class="map-container">
+                        <iframe id="gym-map" width="100%" height="100%" frameborder="0" style="border:0" src="about:blank" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h3>Consejos para el Éxito Diario</h3>
+                    <ul class="custom-list">
+                        <li><span class="highlight">Aplica la regla del 80/20:</span> 80% de tus calorías deben venir de alimentos naturales, y un 20% puedes dejarlo para antojos moderados.</li>
+                        <li><span class="highlight">Bebe suficiente agua:</span> A veces el cuerpo confunde la sed con el hambre.</li>
+                        <li><span class="highlight">Cuidado con las salsas:</span> Una ensalada saludable puede arruinarse con aderezos comerciales calóricos.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="info-card alert-card">
+                    <h3>Advertencias Médicas Importantes</h3>
+                    <p style="margin-bottom: 10px; font-size: 0.9rem;"><strong>Aviso legal:</strong> Este plan es informativo y no sustituye un tratamiento médico ni nutricional profesional.</p>
+                    <ul class="custom-list">
+                        <li><strong>Acude a un nutriólogo:</strong> Un plan personalizado siempre será más efectivo que uno genérico.</li>
+                        <li><strong>Evita los métodos mágicos:</strong> Fajas o pastillas milagrosas NO queman grasa. No arriesgues tu salud hepática y renal.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Lógica de ubicación simplificada
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                document.getElementById('gym-map').src = `https://maps.google.com/maps?q=${lat},${lon}&z=14&output=embed`;
+            });
+        }
+    </script>
+</body>
+</html>

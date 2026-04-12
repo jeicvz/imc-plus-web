@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de cálculos | IMC+</title>
+    <link rel="icon" type="image/png" href="/css/images/icon.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            min-height: 100vh; 
+            background: linear-gradient(135deg, #e0e7ff 0%, #F1F5F9 100%); 
+            color: white;
+            padding-bottom: 40px;
+            overflow-x: hidden;
+            font-weight: bold;
+        }
+
+        .pulse-bg { position: fixed; width: 600px; height: 600px; background: radial-gradient(circle, #38BDF8, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); filter: blur(140px); opacity: 0.15; z-index: -2; animation: pulse 5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.1; } 50% { opacity: 0.2; } 100% { opacity: 0.1; } }
+
+        .container-custom { 
+            max-width: 1100px; 
+            margin: 40px auto; 
+            background: #ffffff; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 22px; 
+            padding: 40px; 
+            /* Sombra suavizada y elegante */
+            box-shadow: 0 15px 40px rgba(15, 23, 42, 0.12);
+            animation: fadeIn 0.8s ease;
+            position: relative;
+            z-index: 1;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ANIMACIÓN SUTIL DE ENTRADA (NIVEL PRO) */
+        .animate-slide { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            border-bottom: 2px solid rgba(15, 23, 42, 0.08); /* Línea más sutil */
+            padding-bottom: 20px;
+        }
+
+        .title-group { text-align: right; }
+        .title-group h1 { font-size: 2rem; font-weight: 900; margin: 0; color: #0f172a; text-transform: uppercase; }
+        .title-group p { color: #0DCAF0; font-weight: 800; font-size: 1rem; margin: 0; }
+
+        .nav-left { display: flex; gap: 15px; align-items: center; }
+
+        /* BOTÓN BORRAR MEJORADO */
+        .btn-borrar {
+            padding: 8px 16px; 
+            background: white; 
+            border: 2px solid #dc3545;
+            color: #dc3545;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-borrar:hover { background: #dc3545; color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3); }
+
+        /* TARJETAS DE RESUMEN (NIVEL TOP) */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .card-stat {
+            background: #F8FAFC;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(15, 23, 42, 0.05);
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            transition: transform 0.3s ease;
+        }
+        .card-stat:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05); }
+        .stat-label { color: #64748B; font-size: 0.85rem; text-transform: uppercase; font-weight: 800; margin-bottom: 5px; letter-spacing: 0.5px; }
+        .stat-value { color: #0f172a; font-size: 2.2rem; font-weight: 900; margin: 0; }
+
+        /* MENSAJE MOTIVACIONAL */
+        .motivational-msg {
+            background: #F8FAFC;
+            border-left: 5px solid #0DCAF0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            color: #1E293B;
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* TABLA Y RESPONSIVIDAD */
+        .table-wrapper { overflow-x: auto; border-radius: 10px; }
+        table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
+        
+        /* ALINEACIONES */
+        .text-center { text-align: center !important; }
+        
+        th { padding: 15px; color: #0f172a; font-weight: 900; text-transform: uppercase; font-size: 0.85rem; border-bottom: 3px solid #0DCAF0; white-space: nowrap; }
+        td { padding: 22px 15px; border-bottom: 1px solid rgba(15, 23, 42, 0.08); font-size: 0.95rem; color: #0f172a; white-space: nowrap; vertical-align: middle; }
+        tr:hover { background: #F8FAFC; transition: 0.2s; }
+
+        /* BADGES */
+        .badge { padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; display: inline-block; letter-spacing: 0.5px;}
+        .bajo-peso { background: #3498db; color: white; }
+        .normal { background: #10B981; color: white; } 
+        .sobrepeso { background: #F59E0B; color: white; } 
+        .obesidad { background: #EF4444; color: white; } 
+
+        /* IMC DESTACADO Y CON COLOR */
+        .imc-destacado {
+            font-size: 1.25rem;
+            font-weight: 900;
+        }
+        .text-bajo-peso { color: #3498db; }
+        .text-normal { color: #10B981; }
+        .text-sobrepeso { color: #F59E0B; }
+        .text-obesidad { color: #EF4444; }
+
+        /* HOVER DE BOTÓN VER PLAN MEJORADO CON ÍCONO */
+        .btn-ver-plan {
+            background-color: #0DCAF0;
+            color: #0f172a;
+            padding: 8px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 2px solid transparent;
+        }
+        .btn-ver-plan:hover {
+            background-color: #0f172a;
+            color: #0DCAF0;
+            border-color: #0DCAF0;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 15px rgba(13, 202, 240, 0.4);
+        }
+
+        .empty-state { text-align: center; padding: 60px; color: #0f172a; }
+
+        @media(max-width: 768px) {
+            header { flex-direction: column-reverse; gap: 20px; }
+            .nav-left { width: 100%; justify-content: center; }
+            .title-group { text-align: center; }
+            /* Se ajustó margin a auto para centrar y width a 92% para que no desborde */
+            .container-custom { padding: 20px; margin: 20px auto; width: 92%; }
+            .summary-cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <div class="pulse-bg"></div>
+
+    <div class="container container-custom">
+        <header>
+            <div class="nav-left">
+                <% if (registros.length > 0) { %>
+                    <button onclick="confirmarBorrado()" class="btn-borrar">
+                        <span>🗑️</span> Borrar Historial
+                    </button>
+                <% } %>
+            </div>
+            
+            <div class="title-group">
+                <h1>Historial de cálculos</h1>
+                <p>Usuario: <%= usuario %></p>
+            </div>
+        </header>
+
+        <main>
+            <% if (registros.length > 0) { %>
+                
+                <% 
+                    // LÓGICA DE CÁLCULOS PARA CARDS Y MENSAJE
+                    let ultimoCalculo = registros[0];
+                    let estadoActual = (ultimoCalculo.Estado || ultimoCalculo.estado || "").toLowerCase();
+                    let ultimoIMC = parseFloat(ultimoCalculo.ResultadoIMC || ultimoCalculo.resultadoImc).toFixed(1);
+                    
+                    // Calcular promedio histórico
+                    let sumaIMC = 0;
+                    registros.forEach(r => sumaIMC += parseFloat(r.ResultadoIMC || r.resultadoImc));
+                    let promedioIMC = (sumaIMC / registros.length).toFixed(1);
+
+                    let mensaje = "";
+                    let emojiMsg = "💡";
+                    let colorBorde = "#0DCAF0";
+
+                    if (estadoActual.includes("normal")) {
+                        mensaje = "¡Excelente trabajo! Tu último cálculo indica que te mantienes en un rango saludable. ¡Sigue así!";
+                        emojiMsg = "🎉";
+                        colorBorde = "#10B981";
+                    } else if (estadoActual.includes("bajo")) {
+                        mensaje = "Cuida tu alimentación. Es importante nutrir tu cuerpo adecuadamente, revisa tu plan para ganar masa de forma saludable.";
+                        emojiMsg = "🥑";
+                        colorBorde = "#3498db";
+                    } else {
+                        mensaje = "Puedes mejorar. Cada pequeño paso cuenta, revisa tu plan para alcanzar tu meta de salud y sentirte mejor.";
+                        emojiMsg = "💪";
+                        colorBorde = "#F59E0B";
+                        if(estadoActual.includes("obesidad")) colorBorde = "#EF4444";
+                    }
+                %>
+                
+                <div class="summary-cards">
+                    <div class="card-stat animate-slide" style="animation-delay: 0.1s;">
+                        <p class="stat-label">Último IMC</p>
+                        <h3 class="stat-value"><%= ultimoIMC %></h3>
+                    </div>
+                    <div class="card-stat animate-slide" style="animation-delay: 0.2s;">
+                        <p class="stat-label">Promedio IMC</p>
+                        <h3 class="stat-value"><%= promedioIMC %></h3>
+                    </div>
+                    <div class="card-stat animate-slide" style="animation-delay: 0.3s;">
+                        <p class="stat-label">Estado Actual</p>
+                        <h3 class="stat-value" style="font-size: 1.25rem; margin-top: 10px; color: <%= colorBorde %>;">
+                            <%= (ultimoCalculo.Estado || ultimoCalculo.estado).toUpperCase() %>
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="motivational-msg animate-slide" style="border-left-color: <%= colorBorde %>; animation-delay: 0.4s;">
+                    <span style="font-size: 1.2rem;"><%= emojiMsg %></span> <%= mensaje %>
+                </div>
+
+                <div class="table-wrapper animate-slide" style="animation-delay: 0.5s;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Peso</th>
+                                <th>Altura</th>
+                                <th class="text-center">IMC</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center">Mis planes</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% registros.forEach(reg => { 
+                                let colorClass = "";
+                                let textClass = "";
+                                let linkPlan = "#";
+                                let estadoTxt = (reg.Estado || reg.estado || "").toLowerCase();
+                                
+                                if (estadoTxt.includes("bajo")) {
+                                    colorClass = "bajo-peso";
+                                    textClass = "text-bajo-peso";
+                                    linkPlan = "/planbajopeso";
+                                } else if (estadoTxt.includes("normal")) {
+                                    colorClass = "normal";
+                                    textClass = "text-normal";
+                                    linkPlan = "/planpesonormal";
+                                } else if (estadoTxt.includes("sobrepeso")) {
+                                    colorClass = "sobrepeso";
+                                    textClass = "text-sobrepeso";
+                                    linkPlan = "/plansobrepeso";
+                                } else if (estadoTxt.includes("obesidad")) {
+                                    colorClass = "obesidad";
+                                    textClass = "text-obesidad";
+                                    linkPlan = "/planobesidad";
+                                }
+                            %>
+                                <tr>
+                                    <td style="opacity: 0.8; color: #64748B;"><%= new Date(reg.Fecha_Calculo || reg.fecha).toLocaleDateString() %></td>
+                                    <td><strong><%= reg.Peso || reg.peso %></strong> <small style="color:#64748B;">kg</small></td>
+                                    <td><%= reg.Altura || reg.altura %> <small style="color:#64748B;">m</small></td>
+                                    
+                                    <td class="text-center imc-destacado <%= textClass %>">
+                                        <%= parseFloat(reg.ResultadoIMC || reg.resultadoImc).toFixed(1) %>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <span class="badge <%= colorClass %>">
+                                            <%= reg.Estado || reg.estado %>
+                                        </span>
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <a href="<%= linkPlan %>" class="btn-ver-plan">
+                                            <span>📋</span> Ver Plan
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <p>No se encontraron registros en tu cuenta.</p>
+                    <br>
+                    <a href="/#calculadora" style="color: #0DCAF0; text-decoration: none; font-weight: 900;">Realizar mi primer cálculo →</a>
+                </div>
+            <% } %>
+        </main>
+    </div>
+
+    <script>
+        function confirmarBorrado() {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esto borrará todos tus cálculos. Esta acción no se puede deshacer.",
+                icon: 'warning',
+                iconColor: '#ffffff',
+                showCancelButton: true,
+                background: '#0f172a',
+                color: '#fff',
+                confirmButtonColor: '#2563EB',
+                cancelButtonColor: '#e74c3c',
+                confirmButtonText: 'Sí, borrar todo',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/borrar-historial';
+                }
+            })
+        }
+    </script>
+</body>
+</html>
