@@ -146,6 +146,9 @@
         
         .nav-item-dropdown { position: static; } 
         .dropdown-content { left: 0; right: 0; width: 100%; top: 100%; border-radius: 0 0 12px 12px; }
+
+        /* Clase auxiliar para forzar la visibilidad en móviles */
+        .dropdown-content.show-mobile { display: block !important; }
     }
 </style>
 
@@ -188,7 +191,7 @@
             
             <div class="nav-item-dropdown">
                 <a href="#" class="sub-link" id="link-alimentacion">ALIMENTACIÓN</a>
-                <div class="dropdown-content">
+                <div class="dropdown-content" id="menu-alimentacion">
                     <a href="/piramide-salud">Pirámide de salud</a>
                     <a href="/alimentos-recomendados">R. Generales</a>
                 </div>
@@ -240,11 +243,30 @@
         });
     }
 
-    // --- MAGIA PARA GUARDAR LA POSICIÓN DEL SCROLL EN MÓVILES ---
+    // --- MAGIA PARA GUARDAR LA POSICIÓN DEL SCROLL EN MÓVILES Y CORRECCIÓN DE DROPDOWN ---
     document.addEventListener("DOMContentLoaded", () => {
         actualizarEnlacesActivos();
 
         const subNav = document.getElementById('scrollableSubNav');
+        const linkAlimentacion = document.getElementById('link-alimentacion');
+        const menuAlimentacion = document.getElementById('menu-alimentacion');
+        
+        // --- NUEVO: FUNCIONALIDAD TÁCTIL PARA EL MENÚ EN CELULARES ---
+        linkAlimentacion.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                e.preventDefault(); // Evita que la pantalla salte hacia arriba
+                menuAlimentacion.classList.toggle('show-mobile');
+            }
+        });
+
+        // Cerrar el menú si tocan fuera de él en el celular
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                if (!linkAlimentacion.contains(e.target) && !menuAlimentacion.contains(e.target)) {
+                    menuAlimentacion.classList.remove('show-mobile');
+                }
+            }
+        });
         
         // 1. Cuando cargue la página, revisamos si había una posición guardada
         const savedScrollPos = sessionStorage.getItem('subNavScrollPosition');
@@ -260,9 +282,12 @@
         // 3. Justo antes de darle clic a un ancla, re-guardamos por si acaso
         document.querySelectorAll('a[href^="/#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
-                sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
-                if (window.location.pathname === "/") {
-                    setTimeout(actualizarEnlacesActivos, 10);
+                // Si la clase no es link-alimentacion, actualizamos
+                if (this.id !== 'link-alimentacion') {
+                    sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
+                    if (window.location.pathname === "/") {
+                        setTimeout(actualizarEnlacesActivos, 10);
+                    }
                 }
             });
         });
