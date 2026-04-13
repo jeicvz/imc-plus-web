@@ -13,6 +13,10 @@
         /* ESTILOS BASE Y FONDO DEGRADADO */
         * { margin:0; padding:0; box-sizing:border-box; }
         
+        html {
+            background-color: #F1F5F9; /* Color base para evitar el borde blanco en el rebote del celular */
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #e0e7ff 0%, #F1F5F9 100%); 
@@ -186,6 +190,9 @@
         }
         .nav-item-dropdown:hover .dropdown-content { display: block; }
 
+        /* Elementos exclusivos de móvil ocultos en PC */
+        .show-on-mobile { display: none !important; }
+
         /* --- CONTENIDO PRINCIPAL: PIRÁMIDE --- */
         .main-container {
             max-width: 1000px; margin: 40px auto 60px auto; padding: 50px;
@@ -219,8 +226,10 @@
             /* AJUSTES SCROLL MÓVIL */
             .sub-navbar { padding: 0; height: auto; overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
             .sub-nav-container { justify-content: flex-start; gap: 25px; padding: 15px 20px; width: max-content; }
-            .nav-item-dropdown { position: static; } 
-            .dropdown-content { left: 0; right: 0; width: 100%; top: 100%; border-radius: 0 0 12px 12px; }
+            
+            /* Ocultamos el contenedor del desplegable y mostramos los enlaces sueltos */
+            .hide-on-mobile { display: none !important; }
+            .show-on-mobile { display: inline-block !important; }
 
             .main-container { margin: 20px 15px; padding: 30px 20px; }
             .hero-title { font-size: 2rem; letter-spacing: 2px;}
@@ -269,13 +278,16 @@
                 <a href="/datos-obesidad" class="sub-link">Datos Obesidad</a>
                 <a href="/faq" class="sub-link">Preguntas Frecuentes</a>
                 
-                <div class="nav-item-dropdown">
+                <div class="nav-item-dropdown hide-on-mobile">
                     <a href="#" class="sub-link" id="link-alimentacion">ALIMENTACIÓN</a>
-                    <div class="dropdown-content">
+                    <div class="dropdown-content" id="menu-alimentacion">
                         <a href="/piramide-salud">Pirámide de salud</a>
                         <a href="/alimentos-recomendados">R. Generales</a>
                     </div>
                 </div>
+
+                <a href="/piramide-salud" class="sub-link show-on-mobile">PIRÁMIDE DE SALUD</a>
+                <a href="/alimentos-recomendados" class="sub-link show-on-mobile">R. GENERALES</a>
             </div>
         </div>
     </div>
@@ -341,7 +353,8 @@
                 } else if (currentPath !== "/" && linkHref === currentPath) {
                     link.classList.add('active-link');
                     if (link.closest('.dropdown-content')) {
-                        document.getElementById('link-alimentacion').classList.add('active-link');
+                        const linkAlim = document.getElementById('link-alimentacion');
+                        if (linkAlim) linkAlim.classList.add('active-link');
                     }
                 } else if (currentPath === "/" && currentHash === "" && linkHref === "/") {
                     link.classList.add('active-link');
@@ -349,35 +362,39 @@
             });
         }
 
+        // --- MAGIA PARA GUARDAR LA POSICIÓN DEL SCROLL EN MÓVILES ---
         document.addEventListener("DOMContentLoaded", () => {
             actualizarEnlacesActivos();
 
-            // --- MAGIA DEL SCROLL ---
             const subNav = document.getElementById('scrollableSubNav');
+            
             if (subNav) {
+                // 1. Cuando cargue la página, revisamos si había una posición guardada
                 const savedScrollPos = sessionStorage.getItem('subNavScrollPosition');
                 if (savedScrollPos) {
                     subNav.scrollLeft = parseInt(savedScrollPos, 10);
                 }
 
+                // 2. Cada vez que muevas la barrita con el dedo, guardamos la posición
                 subNav.addEventListener('scroll', () => {
                     sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
                 });
             }
+
+            // 3. Justo antes de darle clic a un ancla, re-guardamos por si acaso
+            document.querySelectorAll('a[href^="/#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    if (this.id !== 'link-alimentacion' && subNav) {
+                        sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
+                        if (window.location.pathname === "/") {
+                            setTimeout(actualizarEnlacesActivos, 10);
+                        }
+                    }
+                });
+            });
         });
 
         window.addEventListener("hashchange", actualizarEnlacesActivos);
-
-        document.querySelectorAll('a[href^="/#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                const subNav = document.getElementById('scrollableSubNav');
-                if (subNav) sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
-                
-                if (window.location.pathname === "/") {
-                    setTimeout(actualizarEnlacesActivos, 10);
-                }
-            });
-        });
     </script>
 </body>
 </html>
