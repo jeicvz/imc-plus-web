@@ -33,6 +33,7 @@
             min-height: 100vh;
             overflow-x: hidden;
             scroll-behavior: smooth;
+            padding-top: 120px; /* Offset para el navbar fijo */
         }
 
         /* EFECTOS DE FONDO SUTILES */
@@ -44,11 +45,20 @@
         }
         @keyframes pulse { 0% { opacity: 0.1; } 50% { opacity: 0.2; } 100% { opacity: 0.1; } }
 
+        /* --- CONTENEDOR PRINCIPAL FIJO --- */
+        .header-fixed-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1001;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+        }
+
         /* --- NAVBAR PRINCIPAL --- */
         .navbar { 
             background-color: #0f172a; padding: 0 60px; height: 70px; display: flex; 
-            justify-content: space-between; align-items: center; position: sticky; 
-            top: 0; z-index: 1001; box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            justify-content: space-between; align-items: center; 
         }
         .logo img { height: 45px; }
 
@@ -109,8 +119,7 @@
         /* --- SUB-NAVBAR --- */
         .sub-navbar { 
             background-color: #0f172a; border-top: 1px solid rgba(255, 255, 255, 0.1); 
-            padding: 0 60px; height: 50px; position: sticky; top: 70px; z-index: 1000;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 0 60px; height: 50px; 
         }
         .sub-nav-container { 
             max-width: 1400px; height: 100%; margin: 0 auto; display: flex; gap: 40px; 
@@ -190,16 +199,19 @@
            RESPONSIVIDAD PERFECTA PARA MÓVILES
            ========================================= */
         @media (max-width: 768px) {
+            body { padding-top: 130px; }
             .navbar { padding: 10px 15px; height: 70px; flex-wrap: nowrap; justify-content: space-between; }
-            .logo img { height: 32px; }
-            .nav-buttons { gap: 8px; min-width: auto; }
+            .logo img { height: 30px; }
+            .nav-buttons { gap: 5px; min-width: auto; }
             
             /* ESTILOS NOMBRES MÓVIL */
             .user-real-name { display: none !important; } 
             .user-username { display: inline-block !important; font-size: 0.85rem; margin-right: 8px; }
 
             .nav-profile-img { margin-right: 0; width: 32px; height: 32px; }
-            .btn-nav-custom { padding: 6px 12px; font-size: 0.75rem; margin-right: 0 !important; }
+            
+            /* Ajuste de tamaño para los botones en celular */
+            .btn-nav-custom { padding: 6px 10px; font-size: 0.7rem; margin-right: 0 !important; }
 
             /* AJUSTES SCROLL MÓVIL */
             .sub-navbar { padding: 0; height: auto; overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
@@ -224,50 +236,52 @@
 
     <div class="pulse-bg"></div>
 
-    <nav class="navbar">
-        <div class="logo">
-            <a href="/"><img src="/css/images/logo.png" alt="IMC Plus Logo"></a>
-        </div>
-        <div class="nav-buttons">
-            <% if (usuario) { %>
-                <img src="<%= (foto && foto !== '') ? foto : '/css/images/nopic.jpg' %>" class="nav-profile-img" alt="Avatar">
-                <span class="user-name user-real-name"><%= (typeof nombre !== 'undefined' && nombre) ? nombre : usuario %></span>
-                <span class="user-name user-username"><%= usuario %></span>
-                <div class="dropdown">
-                    <button class="btn-config" type="button" data-bs-toggle="dropdown" aria-expanded="false">☰</button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item-custom" href="/editar-perfil">Editar Perfil</a></li>
-                        <li><a class="dropdown-item-custom" href="javascript:void(0)" onclick="confirmarCerrarSesionNav()">Cerrar Sesión</a></li>
-                    </ul>
-                </div>
-            <% } else { %>
-                <a href="/login" class="btn-nav-custom" style="margin-right: 10px;">Iniciar Sesión</a>
-                <a href="/registro" class="btn-nav-custom">Registrarse</a>
-            <% } %>
-        </div>
-    </nav>
-
-    <div class="sub-navbar" id="scrollableSubNav">
-        <div class="sub-nav-container">
-            <a href="/" class="sub-link">INICIO</a>
-            <a href="/#calculadora" class="sub-link">CALCULADORA IMC</a>
-            <a href="/#habitos" class="sub-link">HÁBITOS RECOMENDADOS</a>
-            <% if (usuario) { %>
-                <a href="/historial" class="sub-link">Historial de mis cálculos</a>
-            <% } %>
-            <a href="/datos-obesidad" class="sub-link">Datos Obesidad</a>
-            <a href="/faq" class="sub-link">Preguntas Frecuentes</a>
-            
-            <div class="nav-item-dropdown hide-on-mobile">
-                <a href="#" class="sub-link" id="link-alimentacion">ALIMENTACIÓN</a>
-                <div class="dropdown-content" id="menu-alimentacion">
-                    <a href="/piramide-salud">Pirámide de salud</a>
-                    <a href="/alimentos-recomendados">R. Generales</a>
-                </div>
+    <div class="header-fixed-container">
+        <nav class="navbar">
+            <div class="logo">
+                <a href="/"><img src="/css/images/logo.png" alt="IMC Plus Logo"></a>
             </div>
+            <div class="nav-buttons">
+                <% if (usuario) { %>
+                    <img src="<%= (foto && foto !== '') ? foto : '/css/images/nopic.jpg' %>" class="nav-profile-img" alt="Avatar">
+                    <span class="user-name user-real-name"><%= (typeof nombre !== 'undefined' && nombre) ? nombre : usuario %></span>
+                    <span class="user-name user-username"><%= usuario %></span>
+                    <div class="dropdown">
+                        <button class="btn-config" type="button" data-bs-toggle="dropdown" aria-expanded="false">☰</button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item-custom" href="/editar-perfil">Editar Perfil</a></li>
+                            <li><a class="dropdown-item-custom" href="javascript:void(0)" onclick="confirmarCerrarSesionNav()">Cerrar Sesión</a></li>
+                        </ul>
+                    </div>
+                <% } else { %>
+                    <a href="/login" class="btn-nav-custom" style="margin-right: 10px;">Iniciar Sesión</a>
+                    <a href="/registro" class="btn-nav-custom">Registrarse</a>
+                <% } %>
+            </div>
+        </nav>
 
-            <a href="/piramide-salud" class="sub-link show-on-mobile">PIRÁMIDE DE SALUD</a>
-            <a href="/alimentos-recomendados" class="sub-link show-on-mobile">R. GENERALES</a>
+        <div class="sub-navbar" id="scrollableSubNav">
+            <div class="sub-nav-container">
+                <a href="/" class="sub-link">INICIO</a>
+                <a href="/#calculadora" class="sub-link">CALCULADORA IMC</a>
+                <a href="/#habitos" class="sub-link">HÁBITOS RECOMENDADOS</a>
+                <% if (usuario) { %>
+                    <a href="/historial" class="sub-link">Historial de mis cálculos</a>
+                <% } %>
+                <a href="/datos-obesidad" class="sub-link">Datos Obesidad</a>
+                <a href="/faq" class="sub-link">Preguntas Frecuentes</a>
+                
+                <div class="nav-item-dropdown hide-on-mobile">
+                    <a href="#" class="sub-link" id="link-alimentacion">ALIMENTACIÓN</a>
+                    <div class="dropdown-content" id="menu-alimentacion">
+                        <a href="/piramide-salud">Pirámide de salud</a>
+                        <a href="/alimentos-recomendados">R. Generales</a>
+                    </div>
+                </div>
+
+                <a href="/piramide-salud" class="sub-link show-on-mobile">PIRÁMIDE DE SALUD</a>
+                <a href="/alimentos-recomendados" class="sub-link show-on-mobile">R. GENERALES</a>
+            </div>
         </div>
     </div>
 
@@ -727,6 +741,8 @@
 
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         function confirmarCerrarSesionNav() {
