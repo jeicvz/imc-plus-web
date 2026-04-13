@@ -9,20 +9,33 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 
-/* Agregamos el color base al HTML para evitar bordes blancos/grises en el rebote de iOS */
+/* 1. Fondo azul oscuro de seguridad a nivel de documento */
 html {
     background-color: #0F172A;
 }
 
 body { 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-    min-height: 100vh; /* Cambiado a min-height para mejor adaptación */
-    /* Fondo con el color azul oscuro base, degradado negro y tu imagen */
-    background: #0F172A linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/css/images/logbackground.png') no-repeat center center fixed;
-    background-size: cover;
-    -webkit-background-size: cover; /* Soporte extra para Safari */
+    min-height: 100vh; 
     display: flex; 
-    overflow: hidden; 
+    overflow-x: hidden; 
+    /* Quitamos el fondo de aquí para evitar el bug de Safari */
+}
+
+/* 2. EL TRUCO PARA IPHONE: Capa fija independiente para el fondo */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; /* Se queda al fondo de todo */
+    background-color: #0F172A; /* Base azul oscura */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/css/images/logbackground.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover; /* Asegura que la imagen cubra toda la pantalla sin deformarse */
 }
 
 @keyframes fadeUp {
@@ -46,7 +59,7 @@ body {
     align-items: center; 
     gap: 8px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    border: 2px solid #ffffff; 
+    border: 2px solid #ffffff;
     border-radius: 8px;
     background: transparent;
 }
@@ -59,7 +72,7 @@ body {
 
 .main-split { display: flex; width: 100%; height: 100%; }
 
-/* Texto Izquierda (Vuelve a blanco con sombra para destacar sobre la imagen) */
+/* Texto Izquierda */
 .left-side { 
     flex: 1; 
     display: flex; 
@@ -93,7 +106,7 @@ body {
     padding: 20px; 
 }
 
-/* Tarjeta Glassmorphism Azul Restaurada */
+/* Tarjeta Glassmorphism */
 .login-card { 
     background: rgba(15, 23, 42, 0.7); 
     backdrop-filter: blur(10px); 
@@ -112,7 +125,7 @@ body {
 .form-title { color: #ffffff; font-size: 2rem; font-weight: 900; margin-bottom: 5px; }
 .subtitle-text { color: #93c5fd; font-size: 14px; font-weight: 600; margin-bottom: 25px; }
 
-/* Alerta de Error Clara */
+/* Alerta de Error */
 .error-alert { 
     background: #fef2f2; 
     color: #dc2626; 
@@ -149,7 +162,6 @@ body {
     transition: all 0.3s ease; 
     pointer-events: none; 
 }
-/* Etiqueta Flotante */
 .input-group input:focus + label, .input-group input:not(:placeholder-shown) + label { 
     top: -8px; 
     left: 12px; 
@@ -161,11 +173,9 @@ body {
     border-radius: 4px; 
 }
 
-/* Validación Visual */
 .input-group input.is-invalid { border-color: #ef4444; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1); }
 .input-group input.is-valid { border-color: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); }
 
-/* Ojo de Contraseña SVG */
 .toggle-password { 
     position: absolute; 
     right: 15px; 
@@ -180,7 +190,6 @@ body {
 }
 .toggle-password:hover { color: #0EA5E9; }
 
-/* Botón Principal */
 .btn-login { 
     width: 100%; 
     padding: 16px; 
@@ -212,7 +221,6 @@ body {
 .separador::before { margin-right: 1em; } 
 .separador::after { margin-left: 1em; }
 
-/* Botón de Google centrado e integrado */
 .google-btn-wrapper { margin-bottom: 20px; display: flex; justify-content: center; transition: transform 0.3s ease; }
 .google-btn-wrapper:hover { transform: scale(1.02); }
 
@@ -220,17 +228,22 @@ body {
 .footer-links a:hover { color: #0284c7; text-decoration: underline; }
 .no-cuenta { color: #94a3b8; margin-top: 20px; font-size: 0.95rem; }
 
-/* --- RESPONSIVIDAD CORREGIDA --- */
+/* --- RESPONSIVIDAD CORREGIDA PARA CELULARES --- */
 @media(max-width: 900px) { 
     body { 
-        overflow-y: auto; 
         height: auto; 
-        min-height: 100vh; 
-        /* En iOS, cambiar a scroll evita que el fondo se corte */
-        background-attachment: scroll; 
+        overflow-y: auto; /* Permite el scroll normal */
+    }
+    .main-split { 
+        height: auto; 
+        min-height: 100vh; /* Permite que el contenedor crezca */
     }
     .left-side { display: none; } 
-    .right-side { padding: 90px 20px 40px 20px; width: 100%; align-items: flex-start; }
+    .right-side { 
+        padding: 90px 20px 40px 20px; 
+        width: 100%; 
+        align-items: flex-start; /* Evita que se corte por arriba al hacer scroll */
+    }
     .login-card { max-width: 420px; padding: 45px 30px; margin: 0 auto; }
     .btn-regresar { top: 20px; left: 20px; }
 }
