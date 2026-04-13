@@ -13,6 +13,10 @@
 
     <style>
         /* RESET Y BASE - LIMPIO Y NATURAL */
+        html {
+            background-color: #0F172A; /* Fondo oscuro para el rebote (overscroll) superior e inferior */
+        }
+
         html, body {
             overflow-x: hidden; /* Solo evita scroll horizontal */
             width: 100%;
@@ -22,7 +26,7 @@
 
         body { 
             font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; 
-            background-color: #F1F5F9; 
+            background-color: #0F172A; /* Base azul oscuro en lugar de blanco para proteger los bordes */
             color: #1E293B; 
             scroll-behavior: smooth; 
         }
@@ -302,7 +306,7 @@
             padding: 60px 20px;
             text-align: center;
             width: 100%;
-            margin-top: 20px;
+            /* Sin margen superior para que quede completamente unido a la sección de arriba */
         }
         .final-disclaimer p {
             max-width: 900px;
