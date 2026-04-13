@@ -324,8 +324,14 @@
                 margin-top: -2px !important; 
             }
 
-            .carousel-item img { height: 55vh; }
-            .carousel-caption h3 { font-size: 2rem; }
+            /* --- CAMBIO APLICADO: CARRUSEL A PANTALLA COMPLETA EN MÓVIL --- */
+            .carousel-item img { 
+                height: calc(100vh - 70px); /* Abarca toda la pantalla descontando la navbar */
+            }
+            .carousel-caption h3 { 
+                font-size: 2.5rem; /* Un poco más grande para que imponga en pantalla completa */
+                line-height: 1.2;
+            }
             
             .hero-banner { padding: 50px 15px; }
             .hero-banner h1 { font-size: 1.8rem; }
