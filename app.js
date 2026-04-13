@@ -294,8 +294,22 @@ app.get('/historial', async (req, res) => {
     if (!req.session.usuarioId) return res.redirect('/login');
     try {
         let result = await pool.query('SELECT * FROM Historial WHERE id_del_usuario = $1 ORDER BY fecha DESC', [req.session.usuarioId]);
+        const registros = result.rows;
+        
+        // --- CÁLCULOS SEGUROS PARA EVITAR NaN ---
+        const ultimoIMC = registros.length > 0 
+            ? parseFloat(registros[0].resultadoimc || registros[0].ResultadoIMC || 0).toFixed(1) 
+            : "0.0";
+        
+        const suma = registros.reduce((acc, row) => acc + parseFloat(row.resultadoimc || row.ResultadoIMC || 0), 0);
+        const promedioIMC = registros.length > 0 
+            ? (suma / registros.length).toFixed(1) 
+            : "0.0";
+
         res.render('historial', { 
-            registros: result.rows, 
+            registros: registros,
+            ultimoIMC: ultimoIMC,
+            promedioIMC: promedioIMC,
             nombre: req.session.nombre || null, 
             usuario: req.session.username || null,
             foto: req.session.foto 

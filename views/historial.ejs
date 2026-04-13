@@ -200,15 +200,9 @@
             <% if (registros.length > 0) { %>
                 
                 <% 
-                    // LÓGICA DE CÁLCULOS PARA CARDS Y MENSAJE
+                    // LÓGICA DE CÁLCULOS PARA MENSAJE (Los números ya vienen listos desde app.js)
                     let ultimoCalculo = registros[0];
                     let estadoActual = (ultimoCalculo.Estado || ultimoCalculo.estado || "").toLowerCase();
-                    let ultimoIMC = parseFloat(ultimoCalculo.ResultadoIMC || ultimoCalculo.resultadoImc).toFixed(1);
-                    
-                    // Calcular promedio histórico
-                    let sumaIMC = 0;
-                    registros.forEach(r => sumaIMC += parseFloat(r.ResultadoIMC || r.resultadoImc));
-                    let promedioIMC = (sumaIMC / registros.length).toFixed(1);
 
                     let mensaje = "";
                     let emojiMsg = "💡";
