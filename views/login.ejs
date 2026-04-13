@@ -8,12 +8,19 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
+
+/* Agregamos el color base al HTML para evitar bordes blancos/grises en el rebote de iOS */
+html {
+    background-color: #0F172A;
+}
+
 body { 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-    height: 100vh; 
-    /* Fondo con tu imagen y un filtro negro neutro suave, SIN el tono azul */
-    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/css/images/logbackground.png') no-repeat center center fixed;
+    min-height: 100vh; /* Cambiado a min-height para mejor adaptación */
+    /* Fondo con el color azul oscuro base, degradado negro y tu imagen */
+    background: #0F172A linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/css/images/logbackground.png') no-repeat center center fixed;
     background-size: cover;
+    -webkit-background-size: cover; /* Soporte extra para Safari */
     display: flex; 
     overflow: hidden; 
 }
@@ -39,7 +46,7 @@ body {
     align-items: center; 
     gap: 8px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    border: 2px solid #ffffff; /* Borde blanco agregado */
+    border: 2px solid #ffffff; 
     border-radius: 8px;
     background: transparent;
 }
@@ -102,8 +109,8 @@ body {
 }
 .login-card:hover { transform: translateY(-3px); transition: transform 0.4s ease; }
 
-.form-title { color: #ffffff; font-size: 2rem; font-weight: 900; margin-bottom: 5px; } /* Letra blanca */
-.subtitle-text { color: #93c5fd; font-size: 14px; font-weight: 600; margin-bottom: 25px; } /* Letra celeste */
+.form-title { color: #ffffff; font-size: 2rem; font-weight: 900; margin-bottom: 5px; }
+.subtitle-text { color: #93c5fd; font-size: 14px; font-weight: 600; margin-bottom: 25px; }
 
 /* Alerta de Error Clara */
 .error-alert { 
@@ -117,7 +124,7 @@ body {
     border: 1px solid #fecaca; 
 }
 
-/* Inputs Estilo Oscuro para que combine con el Glassmorphism */
+/* Inputs Estilo Oscuro */
 .input-group { position: relative; margin-bottom: 25px; display: flex; align-items: center; }
 .input-group input { 
     width: 100%; 
@@ -215,11 +222,15 @@ body {
 
 /* --- RESPONSIVIDAD CORREGIDA --- */
 @media(max-width: 900px) { 
-    body { overflow-y: auto; height: auto; min-height: 100vh; }
+    body { 
+        overflow-y: auto; 
+        height: auto; 
+        min-height: 100vh; 
+        /* En iOS, cambiar a scroll evita que el fondo se corte */
+        background-attachment: scroll; 
+    }
     .left-side { display: none; } 
-    /* Cambiamos align-items a flex-start y damos 90px de espacio superior para no empalmar */
     .right-side { padding: 90px 20px 40px 20px; width: 100%; align-items: flex-start; }
-    /* Agregamos margin: 0 auto para asegurar que siga centrado horizontalmente */
     .login-card { max-width: 420px; padding: 45px 30px; margin: 0 auto; }
     .btn-regresar { top: 20px; left: 20px; }
 }
