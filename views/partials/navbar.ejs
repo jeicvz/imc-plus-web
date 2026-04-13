@@ -145,7 +145,17 @@
         .sub-nav-container { justify-content: flex-start; gap: 25px; padding: 15px 20px; width: max-content; }
         
         .nav-item-dropdown { position: static; } 
-        .dropdown-content { left: 0; right: 0; width: 100%; top: 100%; border-radius: 0 0 12px 12px; }
+        
+        /* --- EL TRUCO ESTÁ AQUÍ --- */
+        /* Lo sacamos del flujo del contenedor para que el 'overflow' no lo recorte */
+        .dropdown-content { 
+            position: fixed; 
+            top: 120px; /* 70px del navbar + 50px de la barra inferior */
+            left: 0; 
+            width: 100%; 
+            border-radius: 0 0 12px 12px; 
+            z-index: 9999;
+        }
 
         /* Clase auxiliar para forzar la visibilidad en móviles */
         .dropdown-content.show-mobile { display: block !important; }
@@ -251,10 +261,10 @@
         const linkAlimentacion = document.getElementById('link-alimentacion');
         const menuAlimentacion = document.getElementById('menu-alimentacion');
         
-        // --- NUEVO: FUNCIONALIDAD TÁCTIL PARA EL MENÚ EN CELULARES ---
+        // --- FUNCIONALIDAD TÁCTIL PARA EL MENÚ EN CELULARES ---
         linkAlimentacion.addEventListener('click', function(e) {
             if (window.innerWidth <= 768) {
-                e.preventDefault(); // Evita que la pantalla salte hacia arriba
+                e.preventDefault(); // Evita que la pantalla salte hacia arriba al tocar el "#"
                 menuAlimentacion.classList.toggle('show-mobile');
             }
         });
