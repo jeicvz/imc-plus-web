@@ -10,11 +10,54 @@ const { OAuth2Client } = require('google-auth-library');
 const app = express();
 const client = new OAuth2Client('996749304935-mav75khojhn4ibjasoglbj0iilmko4o6.apps.googleusercontent.com');
 
-// --- CAMBIO PARA EL SERVIDOR: Configuración de PostgreSQL ---
+// --- CONFIGURACIÓN DE POSTGRESQL ---
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
+
+// =====================================================================
+// --- BLINDAJE CONTRA RAILWAY: CREACIÓN AUTOMÁTICA DE TABLAS ---
+// =====================================================================
+async function inicializarBaseDeDatos() {
+    try {
+        console.log("⏳ Verificando la integridad de la base de datos en Railway...");
+        
+        // 1. Asegurar que la tabla Usuarios exista
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS Usuarios (
+                id SERIAL PRIMARY KEY,
+                nombre VARCHAR(100) NOT NULL,
+                username VARCHAR(50) UNIQUE,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                foto_perfil TEXT
+            );
+        `);
+
+        // 2. Por si la tabla existía pero Railway le borró la columna de la foto
+        await pool.query(`ALTER TABLE Usuarios ADD COLUMN IF NOT EXISTS foto_perfil TEXT;`);
+
+        // 3. Asegurar que la tabla Historial exista
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS Historial (
+                id SERIAL PRIMARY KEY,
+                id_del_usuario INTEGER REFERENCES Usuarios(id) ON DELETE CASCADE,
+                fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                peso NUMERIC(5,2),
+                altura NUMERIC(4,2),
+                resultadoimc NUMERIC(5,2),
+                estado VARCHAR(50)
+            );
+        `);
+
+        console.log("✅ Base de datos domada: Tablas y columnas verificadas.");
+    } catch (err) {
+        console.error("❌ Error al inicializar las tablas:", err);
+    }
+}
+inicializarBaseDeDatos(); // Ejecutamos la función de blindaje al arrancar
+// =====================================================================
 
 const uploadDir = path.join(__dirname, 'public/css/images/uploads/');
 if (!fs.existsSync(uploadDir)){
@@ -411,6 +454,6 @@ app.get('/logout', (req, res) => {
     req.session.destroy(() => { res.redirect('/'); });
 });
 
-// --- CAMBIO PARA EL SERVIDOR: PUERTO DINÁMICO ---
+// --- PUERTO DINÁMICO ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor en http://localhost:${PORT}`));
