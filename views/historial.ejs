@@ -169,7 +169,6 @@
             header { flex-direction: column-reverse; gap: 20px; }
             .nav-left { width: 100%; justify-content: center; }
             .title-group { text-align: center; }
-            /* Se ajustó margin a auto para centrar y width a 92% para que no desborde */
             .container-custom { padding: 20px; margin: 20px auto; width: 92%; }
             .summary-cards { grid-template-columns: 1fr; }
         }
@@ -200,7 +199,7 @@
             <% if (registros.length > 0) { %>
                 
                 <% 
-                    // LÓGICA DE CÁLCULOS PARA MENSAJE (Los números ya vienen listos desde app.js)
+                    // LÓGICA DE CÁLCULOS PARA MENSAJE
                     let ultimoCalculo = registros[0];
                     let estadoActual = (ultimoCalculo.Estado || ultimoCalculo.estado || "").toLowerCase();
 
@@ -264,6 +263,19 @@
                                 let linkPlan = "#";
                                 let estadoTxt = (reg.Estado || reg.estado || "").toLowerCase();
                                 
+                                // OBTENCIÓN ROBUSTA DEL IMC + CÁLCULO AL VUELO DE RESPALDO
+                                let pesoReal = parseFloat(reg.Peso || reg.peso);
+                                let alturaReal = parseFloat(reg.Altura || reg.altura);
+                                let imcValor = reg.IMC || reg.imc || reg.ResultadoIMC || reg.resultadoImc || reg.resultado_imc;
+                                
+                                // Si no encuentra el IMC en la BD o viene como texto inválido, lo calcula automáticamente
+                                if (!imcValor || isNaN(parseFloat(imcValor))) {
+                                    imcValor = pesoReal / (alturaReal * alturaReal);
+                                }
+                                
+                                let imcFinal = parseFloat(imcValor).toFixed(1);
+
+                                // LÓGICA DE COLORES SEGÚN EL ESTADO
                                 if (estadoTxt.includes("bajo")) {
                                     colorClass = "bajo-peso";
                                     textClass = "text-bajo-peso";
@@ -288,7 +300,7 @@
                                     <td><%= reg.Altura || reg.altura %> <small style="color:#64748B;">m</small></td>
                                     
                                     <td class="text-center imc-destacado <%= textClass %>">
-                                        <%= parseFloat(reg.ResultadoIMC || reg.resultadoImc).toFixed(1) %>
+                                        <%= imcFinal %>
                                     </td>
                                     
                                     <td class="text-center">
