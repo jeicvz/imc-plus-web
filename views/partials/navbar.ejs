@@ -39,6 +39,7 @@
         object-fit: cover;
         margin-right: 12px;
         flex-shrink: 0;
+        background-color: #1E293B; /* Color de fondo por si tarda en cargar */
     }
 
     /* --- ESTILOS DE NOMBRE DINÁMICO --- */
@@ -159,8 +160,9 @@
             <a href="/"><img src="/css/images/logo.png" alt="IMC Plus Logo"></a>
         </div>
         <div class="nav-buttons">
-            <% if (usuario) { %>
-                <img src="<%= (foto && foto !== '') ? foto : '/css/images/nopic.jpg' %>" class="nav-profile-img" alt="Avatar">
+            <% if (typeof usuario !== 'undefined' && usuario) { %>
+                
+                <img src="<%= (typeof foto !== 'undefined' && foto !== null && foto !== 'null' && foto !== '') ? foto : '/css/images/nopic.jpg' %>" class="nav-profile-img" alt="Avatar" onerror="this.src='/css/images/nopic.jpg'">
                 
                 <span class="user-name user-real-name"><%= (typeof nombre !== 'undefined' && nombre) ? nombre : usuario %></span>
                 <span class="user-name user-username"><%= usuario %></span>
@@ -184,7 +186,7 @@
             <a href="/" class="sub-link">INICIO</a>
             <a href="/#calculadora" class="sub-link">CALCULADORA IMC</a>
             <a href="/#habitos" class="sub-link">HÁBITOS RECOMENDADOS</a>
-            <% if (usuario) { %>
+            <% if (typeof usuario !== 'undefined' && usuario) { %>
                 <a href="/historial" class="sub-link">Historial de mis cálculos</a>
             <% } %>
             <a href="/datos-obesidad" class="sub-link">Datos Obesidad</a>
@@ -262,14 +264,16 @@
         }
 
         // 2. Cada vez que muevas la barrita con el dedo, guardamos la posición
-        subNav.addEventListener('scroll', () => {
-            sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
-        });
+        if(subNav) {
+            subNav.addEventListener('scroll', () => {
+                sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
+            });
+        }
 
         // 3. Justo antes de darle clic a un ancla, re-guardamos por si acaso
         document.querySelectorAll('a[href^="/#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
-                if (this.id !== 'link-alimentacion') {
+                if (this.id !== 'link-alimentacion' && subNav) {
                     sessionStorage.setItem('subNavScrollPosition', subNav.scrollLeft);
                     if (window.location.pathname === "/") {
                         setTimeout(actualizarEnlacesActivos, 10);
